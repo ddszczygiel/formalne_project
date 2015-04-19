@@ -1,0 +1,30 @@
+REQUIRED
+
+operacje na sieciach uogólnionych:
+
+- definicja - z poziomu GUI
+- wyświetlanie sieci w GUI
+- możliwość edycji ( miejsca, przejścia, łuki )
+- wczytywanie i zapis sieci
+
+- graf pokrycia ( ograniczenie z max ilością wierzchołków )
+- graf osiągalności
+- badanie parametrów
+	+ żywotność
+	+ sieć miejsc i przejść
+	+ zachowawczość względem wektora
+	+ ograniczoność
+	+ bezpieczeństwo
+	+ odwracalność
+	+ reprezntacja macierzowa
+	+ uruchomienie z GUI aktywnego przejścia
+	
+nasze rozszerzenie:
+
+	- sieć priorytetowa
+	
+	
++++
+Zbudowanie sieci kolorowanej - linia produkcyjna piwa :D
+
+model, wnioski, sieć, podsumowanie
