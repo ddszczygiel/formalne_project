@@ -1,6 +1,8 @@
 package com.agh.met_for_project.util;
 
 
+import com.agh.met_for_project.error.ErrorType;
+import com.agh.met_for_project.error.InvalidOperationException;
 import com.agh.met_for_project.model.InArc;
 import com.agh.met_for_project.model.OutArc;
 import com.agh.met_for_project.model.Place;
@@ -13,8 +15,6 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Component
 public class NetworkLoader {
@@ -23,91 +23,100 @@ public class NetworkLoader {
     private PetriesNetwork petriesNetwork;
 
     private final String NETWORK_FILE = "/network.txt";
-    private final String CONNECTION_LINE_PATTERN = "(\\w+) (\\w+) (\\w+) (\\d+) (\\d+)";
+    private final String VALUES_SEPARATOR = ";";
 
-    public void loadNetwork(String filePath) {
+    public void loadNetwork(String filePath) throws InvalidOperationException {
 
         List<String> parsed = getLinesFromFile(filePath);
-        if (!parsed.isEmpty()) {
+        try {
+            if (!parsed.isEmpty()) {
 
-            petriesNetwork.setUpNetwork();
-            int placeCount = Integer.parseInt(parsed.get(0));
-            int transitionCount = Integer.parseInt(parsed.get(1));
-            prepareNetworkElements(placeCount, transitionCount);
-            assignInitialStates(parsed.get(2).split(" "));
-            Pattern connectionPattern = Pattern.compile(CONNECTION_LINE_PATTERN);
-            for (int i=3; i<parsed.size(); i++) {
+                petriesNetwork.setUpNetwork();
+                int placeCount = Integer.parseInt(parsed.get(0));
+                int transitionCount = Integer.parseInt(parsed.get(1));
+                int[] placesInterval = new int[]{2, 2 + placeCount};
+                int[] transitionsInterval = new int[]{2 + placeCount, 2 + placeCount + transitionCount};
+                preparePlaces(parsed, placesInterval[0], placesInterval[1]);
+                prepareTransitions(parsed, transitionsInterval[0], transitionsInterval[1]);
+                createConnections(parsed, transitionsInterval[1]);
 
-                Matcher match = connectionPattern.matcher(parsed.get(i));
-                match.find();
-                createConnection(match);
+                return;
             }
-        } else {
-            //TODO to do
+        } catch (NumberFormatException | IndexOutOfBoundsException e) {}
+
+        throw new InvalidOperationException(ErrorType.INVALID_FILE_PARAMETERS);
+    }
+
+    private void preparePlaces(List<String> parsed, int start, int end) throws InvalidOperationException {
+
+        for (int i = start; i<end; i++) {
+            String[] params = parsed.get(i).split(VALUES_SEPARATOR);
+            petriesNetwork.addPlace(params[0], Integer.parseInt(params[1]));
         }
     }
 
-    private void prepareNetworkElements(int placeCount, int transitionCount) {
+    private void prepareTransitions(List<String> parsed, int start, int end) throws InvalidOperationException {
 
-        for (int i=0; i<placeCount; i++) {
-            petriesNetwork.getPlaces().add(new Place());
-        }
+        for (int i = start; i<end; i++) {
 
-        for (int i=0; i<transitionCount; i++) {
-            petriesNetwork.getTransitions().add(new Transition());
+            String[] params = parsed.get(i).split(VALUES_SEPARATOR);
+            petriesNetwork.addTransition(params[0], Integer.parseInt(params[1]));
         }
     }
 
-    private void assignInitialStates(String[] states) {
+    private void createConnections(List<String> parsed, int start) throws InvalidOperationException {
 
-        for (int i=0; i<states.length; i++) {
-            petriesNetwork.getPlaces().get(i).setState(Integer.parseInt(states[i]));
+
+        for (int i = start; i<parsed.size(); i++) {
+
+            String[] params = parsed.get(i).split(VALUES_SEPARATOR);
+            if (params.length != 5) {
+                throw new InvalidOperationException(ErrorType.INVALID_FILE_PARAMETERS);
+            }
+
+            Place begin = petriesNetwork.getPlaceByName(params[0]);
+            Place end = petriesNetwork.getPlaceByName(params[1]);
+            Transition t = petriesNetwork.getTransitionByName(params[2]);
+
+            if ((begin == null) || (end == null)) {
+                throw new InvalidOperationException(ErrorType.PLACE_NOT_EXIST);
+            }
+
+            if (t == null) {
+                throw new InvalidOperationException(ErrorType.TRANSITION_NOT_EXIST);
+            }
+
+            OutArc outArc = new OutArc();
+            outArc.setBegin(begin);
+            outArc.setValue(Integer.parseInt(params[3]));
+            InArc inArc = new InArc();
+            inArc.setEnd(end);
+            inArc.setValue(Integer.parseInt(params[4]));
+            t.getIn().add(outArc);
+            t.getOut().add(inArc);
         }
     }
 
-    private void createConnection(Matcher match) {
-
-        int from = Integer.parseInt(match.group(1));
-        int to = Integer.parseInt(match.group(2));
-        int transitionNo = Integer.parseInt(match.group(3));
-        Place p1 = petriesNetwork.getPlaces().get(from - 1);
-        Place p2 = petriesNetwork.getPlaces().get(to - 1);
-        Transition transition = petriesNetwork.getTransitions().get(transitionNo - 1);
-
-        OutArc outArc = new OutArc();
-        outArc.setEnd(transition);
-        outArc.setBegin(p1);
-        outArc.setValue(Integer.parseInt(match.group(4)));
-
-        InArc inArc = new InArc();
-        inArc.setBegin(transition);
-        inArc.setEnd(p2);
-        inArc.setValue(Integer.parseInt(match.group(5)));
-
-        transition.getIn().add(outArc);
-        transition.getOut().add(inArc);
-    }
-
-    public void saveNetwork() {
+    public void saveNetwork() throws InvalidOperationException {
 
         List<String> lines = new ArrayList<>();
         lines.add(Integer.toString(petriesNetwork.getPlaces().size()));
         lines.add(Integer.toString(petriesNetwork.getTransitions().size()));
-        List<String> initialStates = new ArrayList<>();
         for (Place p : petriesNetwork.getPlaces()) {
-            initialStates.add(Integer.toString(p.getState()));
+            lines.add(String.format("%s%s%s", p.getName(), VALUES_SEPARATOR, Integer.toString(p.getState())));
         }
-        lines.add(Joiner.on(" ").join(initialStates));
-
+        List<String> connectionLines = new ArrayList<>();
         for (Transition t : petriesNetwork.getTransitions()) {
+            lines.add(String.format("%s%s%s", t.getName(), VALUES_SEPARATOR, Integer.toString(t.getPriority())));
             for (OutArc outArc : t.getIn()) {
                 for (InArc inArc : t.getOut()) {
-                    lines.add(String.format("%s %s %s %d %d", outArc.getBegin().getName(), inArc.getEnd().getName(),
-                            t.getName(), outArc.getValue(), inArc.getValue()));
+
+                    connectionLines.add(Joiner.on(VALUES_SEPARATOR).join(new String[] { outArc.getBegin().getName(), inArc.getEnd().getName(),
+                            t.getName(), Integer.toString(outArc.getValue()), Integer.toString(inArc.getValue()) }));
                 }
             }
         }
-
+        lines.addAll(connectionLines);
         saveNetworkToFile(lines);
     }
 
@@ -124,25 +133,24 @@ public class NetworkLoader {
                 lines.add(line);
             }
             file.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException e) {}
 
         return lines;
     }
 
-    public void saveNetworkToFile(List<String> network) {
+    private void saveNetworkToFile(List<String> network) throws InvalidOperationException {
 
         try {
 
             BufferedWriter file = new BufferedWriter(new FileWriter("net.txt"));
             for (String val : network) {
+
                 file.write(val);
                 file.newLine();
             }
             file.close();
         } catch (IOException e) {
-            //FIXME ???
+            throw new InvalidOperationException(ErrorType.SAVE_NETWORK_ERROR);
         }
     }
 

@@ -10,7 +10,6 @@ import com.agh.met_for_project.model.Transition;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,7 +113,6 @@ public class PetriesNetwork {
 
             InArc inArc = new InArc();
             inArc.setValue(value);
-            inArc.setBegin(t);
             inArc.setEnd(p);
             t.getOut().add(inArc);
         } else {
@@ -122,7 +120,6 @@ public class PetriesNetwork {
             OutArc outArc = new OutArc();
             outArc.setValue(value);
             outArc.setBegin(p);
-            outArc.setEnd(t);
             t.getIn().add(outArc);
         }
     }
