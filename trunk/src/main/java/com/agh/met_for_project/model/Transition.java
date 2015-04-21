@@ -1,8 +1,7 @@
 package com.agh.met_for_project.model;
 
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Transition {
 
@@ -35,16 +34,8 @@ public class Transition {
         return in;
     }
 
-    public void setIn(List<OutArc> in) {
-        this.in = in;
-    }
-
     public List<InArc> getOut() {
         return out;
-    }
-
-    public void setOut(List<InArc> out) {
-        this.out = out;
     }
 
     public String getName() {
@@ -54,4 +45,58 @@ public class Transition {
     public void setName(String name) {
         this.name = name;
     }
+
+    public boolean isExecutable() {
+
+        for (OutArc outArc : in) {
+            if ((outArc.getBegin().getState()-outArc.getValue()) < 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void execute() {
+
+        for (OutArc outArc : in) {
+            outArc.getBegin().setState(outArc.getBegin().getState()-outArc.getValue());
+        }
+        for (InArc inArc : out) {
+            inArc.getEnd().setState(inArc.getEnd().getState()+inArc.getValue());
+        }
+    }
+
+    public boolean isExecutable(Map<String, Integer> actualPlacesStates) {
+
+        for (OutArc outArc : in) {
+
+            int actualPlaceState = actualPlacesStates.get(outArc.getBegin().getName());  //FIXME need to check ???
+            if ((actualPlaceState-outArc.getValue()) < 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public Map<String, Integer> execute(Map<String, Integer> actualPlacesStates) {
+
+        Map<String, Integer> newPlacesStates = new TreeMap<>();
+        for (OutArc outArc : in) {
+
+            String placeName = outArc.getBegin().getName();
+            int actualPlaceState = actualPlacesStates.get(placeName);
+            newPlacesStates.put(placeName, actualPlaceState-outArc.getValue());
+        }
+        for (InArc inArc : out) {
+
+            String placeName = inArc.getEnd().getName();
+            int actualPlaceState = actualPlacesStates.get(placeName);
+            newPlacesStates.put(placeName, actualPlaceState+inArc.getValue());
+        }
+
+        return newPlacesStates;
+    }
+
 }
