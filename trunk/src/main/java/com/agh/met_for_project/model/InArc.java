@@ -11,6 +11,21 @@ public class InArc implements Arc {
         return value;
     }
 
+    @Override
+    public int getPlaceState() {
+        return end.getState();
+    }
+
+    @Override
+    public void setPlaceState(int newState) {
+        end.setState(newState);
+    }
+
+    @Override
+    public String getPlaceName() {
+        return end.getName();
+    }
+
     public void setValue(int value) {
         this.value = value;
     }

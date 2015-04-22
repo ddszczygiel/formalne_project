@@ -11,6 +11,21 @@ public class OutArc implements Arc {
         return value;
     }
 
+    @Override
+    public int getPlaceState() {
+        return begin.getState();
+    }
+
+    @Override
+    public void setPlaceState(int newState) {
+        begin.setState(newState);
+    }
+
+    @Override
+    public String getPlaceName() {
+        return begin.getName();
+    }
+
     public void setValue(int value) {
         this.value = value;
     }

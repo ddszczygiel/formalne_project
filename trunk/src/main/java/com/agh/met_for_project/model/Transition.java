@@ -48,8 +48,8 @@ public class Transition {
 
     public boolean isExecutable() {
 
-        for (OutArc outArc : in) {
-            if ((outArc.getBegin().getState()-outArc.getValue()) < 0) {
+        for (Arc arc : in) {
+            if ((arc.getPlaceState()-arc.getValue()) < 0) {
                 return false;
             }
         }
@@ -59,20 +59,21 @@ public class Transition {
 
     public void execute() {
 
-        for (OutArc outArc : in) {
-            outArc.getBegin().setState(outArc.getBegin().getState()-outArc.getValue());
+        for (Arc arc : in) {
+            arc.setPlaceState(arc.getPlaceState() - arc.getValue());
         }
-        for (InArc inArc : out) {
-            inArc.getEnd().setState(inArc.getEnd().getState()+inArc.getValue());
+        for (Arc arc : out) {
+            arc.setPlaceState(arc.getPlaceState() + arc.getValue());
         }
+
     }
 
     public boolean isExecutable(Map<String, Integer> actualPlacesStates) {
 
-        for (OutArc outArc : in) {
+        for (Arc arc : in) {
 
-            int actualPlaceState = actualPlacesStates.get(outArc.getBegin().getName());  //FIXME need to check ???
-            if ((actualPlaceState-outArc.getValue()) < 0) {
+            int actualPlaceState = actualPlacesStates.get(arc.getPlaceName());  //FIXME need to check ???
+            if ((actualPlaceState-arc.getValue()) < 0) {
                 return false;
             }
         }
@@ -83,17 +84,17 @@ public class Transition {
     public Map<String, Integer> execute(Map<String, Integer> actualPlacesStates) {
 
         Map<String, Integer> newPlacesStates = new TreeMap<>();
-        for (OutArc outArc : in) {
+        for (Arc arc : in) {
 
-            String placeName = outArc.getBegin().getName();
+            String placeName = arc.getPlaceName();
             int actualPlaceState = actualPlacesStates.get(placeName);
-            newPlacesStates.put(placeName, actualPlaceState-outArc.getValue());
+            newPlacesStates.put(placeName, actualPlaceState-arc.getValue());
         }
-        for (InArc inArc : out) {
+        for (Arc arc : out) {
 
-            String placeName = inArc.getEnd().getName();
+            String placeName = arc.getPlaceName();
             int actualPlaceState = actualPlacesStates.get(placeName);
-            newPlacesStates.put(placeName, actualPlaceState+inArc.getValue());
+            newPlacesStates.put(placeName, actualPlaceState+arc.getValue());
         }
 
         return newPlacesStates;
