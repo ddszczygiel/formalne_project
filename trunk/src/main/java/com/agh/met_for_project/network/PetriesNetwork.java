@@ -7,6 +7,7 @@ import com.agh.met_for_project.model.InArc;
 import com.agh.met_for_project.model.OutArc;
 import com.agh.met_for_project.model.Place;
 import com.agh.met_for_project.model.Transition;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;

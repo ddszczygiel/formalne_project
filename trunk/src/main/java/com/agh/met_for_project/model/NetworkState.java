@@ -75,4 +75,9 @@ public class NetworkState {
         return this;
     }
 
+    public String toString() {
+
+        return String.format("STATE: %s\nEXECUTED TRANSITION: %s\nDUPLICATE %s\nDEAD %s\n", getStatesString(), executedTransitionName, duplicate, dead);
+    }
+
 }

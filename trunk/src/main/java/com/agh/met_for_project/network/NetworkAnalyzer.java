@@ -15,7 +15,7 @@ import java.util.*;
 @Component
 public class NetworkAnalyzer {
 
-    private final int MAX_DEPTH = 30;
+    private final int MAX_DEPTH = 10;
 
     @Autowired
     private PetriesNetwork petriesNetwork;
@@ -30,6 +30,10 @@ public class NetworkAnalyzer {
 
         networkStates = new HashSet<>();
         networkTransitions = petriesNetwork.getTransitions();
+    }
+
+    public void setInitialNode() {
+
         initialNode = new NetworkState();
         for (Place p : petriesNetwork.getPlaces()) {
             initialNode.getStates().put(p.getName(), p.getState());
@@ -39,6 +43,8 @@ public class NetworkAnalyzer {
 
     public void generate() {
 
+        setUp();
+        setInitialNode();
         executeTransitions(initialNode, 1);
     }
 
@@ -66,13 +72,26 @@ public class NetworkAnalyzer {
                 } else {
 
                     networkStates.add(newStatesString);
-                    executeTransitions(childNetworkState, currentDepth++);
+                    executeTransitions(childNetworkState, currentDepth+1);
                 }
             }
         }
 
         if (noActiveTransitions) {
             networkState.setDead(true);
+        }
+    }
+
+    public void printTree() {
+
+        displayNode(initialNode);
+    }
+
+    private void displayNode(NetworkState networkState) {
+
+        System.out.println(networkState);
+        for (NetworkState state : networkState.getNodes()) {
+            displayNode(state);
         }
     }
 

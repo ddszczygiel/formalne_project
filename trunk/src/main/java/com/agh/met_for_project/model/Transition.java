@@ -83,17 +83,17 @@ public class Transition {
 
     public Map<String, Integer> execute(Map<String, Integer> actualPlacesStates) {
 
-        Map<String, Integer> newPlacesStates = new TreeMap<>();
+        Map<String, Integer> newPlacesStates = new TreeMap<>(actualPlacesStates);
         for (Arc arc : in) {
 
             String placeName = arc.getPlaceName();
-            int actualPlaceState = actualPlacesStates.get(placeName);
+            int actualPlaceState = newPlacesStates.get(placeName);
             newPlacesStates.put(placeName, actualPlaceState-arc.getValue());
         }
         for (Arc arc : out) {
 
             String placeName = arc.getPlaceName();
-            int actualPlaceState = actualPlacesStates.get(placeName);
+            int actualPlaceState = newPlacesStates.get(placeName);
             newPlacesStates.put(placeName, actualPlaceState+arc.getValue());
         }
 
