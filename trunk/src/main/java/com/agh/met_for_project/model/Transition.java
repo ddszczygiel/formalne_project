@@ -81,9 +81,11 @@ public class Transition {
         return true;
     }
 
+
+    // TODO execute for building cover tree and additional condition - state can be -1 = infinity )
     public Map<String, Integer> execute(Map<String, Integer> actualPlacesStates) {
 
-        Map<String, Integer> newPlacesStates = new TreeMap<>(actualPlacesStates);
+        Map<String, Integer> newPlacesStates = new LinkedHashMap<>(actualPlacesStates);
         for (Arc arc : in) {
 
             String placeName = arc.getPlaceName();

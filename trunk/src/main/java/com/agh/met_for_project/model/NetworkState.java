@@ -3,6 +3,7 @@ package com.agh.met_for_project.model;
 
 import com.google.common.base.Joiner;
 
+import javax.print.attribute.IntegerSyntax;
 import java.util.*;
 
 /**
@@ -14,7 +15,7 @@ import java.util.*;
  */
 public class NetworkState {
 
-    private static final String SEPARATOR = ",";
+    public static final String SEPARATOR = ",";
 
     private String executedTransitionName;
     private Map<String, Integer> states;
@@ -24,10 +25,23 @@ public class NetworkState {
 
     public NetworkState() {
 
-        states = new TreeMap<>();   // to provide the same order of places in every new NetworkState
+        states = new LinkedHashMap<>();   // to provide the same order of places in every new NetworkState as in Places list
         nodes = new ArrayList<>();
     }
 
+    public int[] getStatesValues() {
+
+        int[] tab = new int[states.size()];
+        int i = 0;
+        for (Integer val : states.values()) {
+            tab[i] = val;
+            i++;
+        }
+
+        return tab;
+    }
+
+    // FIXME check if needed
     public String getStatesString() {
 
         return Joiner.on(SEPARATOR).join(states.values());
