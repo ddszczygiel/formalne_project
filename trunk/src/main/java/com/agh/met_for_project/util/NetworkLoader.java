@@ -3,6 +3,7 @@ package com.agh.met_for_project.util;
 
 import com.agh.met_for_project.error.ErrorType;
 import com.agh.met_for_project.error.InvalidOperationException;
+import com.agh.met_for_project.model.Arc;
 import com.agh.met_for_project.model.InArc;
 import com.agh.met_for_project.model.OutArc;
 import com.agh.met_for_project.model.Place;
@@ -66,19 +67,18 @@ public class NetworkLoader {
 
     private void createConnections(List<String> parsed, int start) throws InvalidOperationException {
 
-
         for (int i = start; i<parsed.size(); i++) {
 
             String[] params = parsed.get(i).split(VALUES_SEPARATOR);
-            if (params.length != 5) {
+            if (params.length != 4 || !("I".equals(params[0]) || "O".equals(params[0]))) {
                 throw new InvalidOperationException(ErrorType.INVALID_FILE_PARAMETERS);
             }
 
-            Place begin = petriesNetwork.getPlaceByName(params[0]);
-            Place end = petriesNetwork.getPlaceByName(params[1]);
-            Transition t = petriesNetwork.getTransitionByName(params[2]);
+            String arcType = params[0];
+            Transition t = petriesNetwork.getTransitionByName(params[1]);
+            Place p = petriesNetwork.getPlaceByName(params[2]);
 
-            if ((begin == null) || (end == null)) {
+            if (p == null) {
                 throw new InvalidOperationException(ErrorType.PLACE_NOT_EXIST);
             }
 
@@ -86,14 +86,20 @@ public class NetworkLoader {
                 throw new InvalidOperationException(ErrorType.TRANSITION_NOT_EXIST);
             }
 
-            OutArc outArc = new OutArc();
-            outArc.setBegin(begin);
-            outArc.setValue(Integer.parseInt(params[3]));
-            InArc inArc = new InArc();
-            inArc.setEnd(end);
-            inArc.setValue(Integer.parseInt(params[4]));
-            t.getIn().add(outArc);
-            t.getOut().add(inArc);
+            if ("I".equals(arcType)) {
+
+                InArc inArc = new InArc();
+                inArc.setEnd(p);
+                inArc.setValue(Integer.parseInt(params[3]));
+                t.getOut().add(inArc);
+            } else {
+
+                OutArc outArc = new OutArc();
+                outArc.setBegin(p);
+                outArc.setValue(Integer.parseInt(params[3]));
+                t.getIn().add(outArc);
+            }
+
         }
     }
 
@@ -105,15 +111,19 @@ public class NetworkLoader {
         for (Place p : petriesNetwork.getPlaces()) {
             lines.add(String.format("%s%s%s", p.getName(), VALUES_SEPARATOR, Integer.toString(p.getState())));
         }
+
         List<String> connectionLines = new ArrayList<>();
         for (Transition t : petriesNetwork.getTransitions()) {
             lines.add(String.format("%s%s%s", t.getName(), VALUES_SEPARATOR, Integer.toString(t.getPriority())));
-            for (OutArc outArc : t.getIn()) {
-                for (InArc inArc : t.getOut()) {
 
-                    connectionLines.add(Joiner.on(VALUES_SEPARATOR).join(new String[] { outArc.getBegin().getName(), inArc.getEnd().getName(),
-                            t.getName(), Integer.toString(outArc.getValue()), Integer.toString(inArc.getValue()) }));
-                }
+            for (Arc arc : t.getIn()) {
+                connectionLines.add(Joiner.on(VALUES_SEPARATOR).join(new String[] {"O", t.getName(),
+                        arc.getPlaceName(), String.valueOf(arc.getValue())}));
+            }
+
+            for (Arc arc : t.getOut()) {
+                connectionLines.add(Joiner.on(VALUES_SEPARATOR).join(new String[] {"I", t.getName(),
+                        arc.getPlaceName(), String.valueOf(arc.getValue())}));
             }
         }
         lines.addAll(connectionLines);

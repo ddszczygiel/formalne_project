@@ -61,7 +61,6 @@ public class CoverTree {
                     noActiveTransitions = false;
                     NetworkState childState = new NetworkState();
                     state.getNodes().add(childState);
-                    operationQueue.add(childState);
                     Map<String, Integer> newState = t.execute(state.getStates());
                     childState.getStates().putAll(newState);
                     childState.setExecutedTransitionName(t.getName());
@@ -70,11 +69,13 @@ public class CoverTree {
                     if (networkStates.contains(newStatesString)) {
                         childState.setDuplicate(true);
                     } else {
+
                         String coverStateString = getCoverStateString(childState.getStatesValues());
                         if (coverStateString == null) {
-//                            networkStates.add(coverStateString);
                             networkStates.add(newStatesString);
                         } else {
+
+                            operationQueue.add(childState);
                             networkStates.add(coverStateString);
                             updateMapValues(coverStateString, childState.getStates());
                         }
@@ -117,14 +118,26 @@ public class CoverTree {
         int i;
         for (i=0; i<tab.length; i++) {
 
-            if (tab[i]<old[i]) {
+            if (tab[i] < 0) {
+                continue;
+            }
+            if (tab[i]<old[i]) {    //FIXME this condition is bad :(
                 break;
             } else if (tab[i]>old[i]) {
                 tab[i] = -1;
             }
         }
 
-        return (i == tab.length) ? Joiner.on(NetworkState.SEPARATOR).join(Arrays.asList(tab)) : null;
+        if (i == tab.length) {
+
+            String[] sVal = new String[tab.length];
+            for (int j=0; j<tab.length; j++) {
+                sVal[j] = Integer.toString(tab[j]);
+            }
+            return Joiner.on(NetworkState.SEPARATOR).join(sVal);
+        }
+
+        return null;
     }
 
     public String getCoverStateString(int[] state) {
@@ -147,7 +160,7 @@ public class CoverTree {
 
         while (!states.isEmpty()) {
 
-            NetworkState current = states.peek();
+            NetworkState current = states.poll();
             for (NetworkState child : current.getNodes()) {
                 states.add(child);
             }
