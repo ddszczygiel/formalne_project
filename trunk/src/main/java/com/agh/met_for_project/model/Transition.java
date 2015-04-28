@@ -68,11 +68,15 @@ public class Transition {
 
     }
 
+    //FIXME here also prepare for -1 as infinity
     public boolean isExecutable(Map<String, Integer> actualPlacesStates) {
 
         for (Arc arc : in) {
 
             int actualPlaceState = actualPlacesStates.get(arc.getPlaceName());  //FIXME need to check ???
+            if (actualPlaceState < 0) {
+                continue;    // support for infinity !!!
+            }
             if ((actualPlaceState-arc.getValue()) < 0) {
                 return false;
             }
@@ -90,13 +94,21 @@ public class Transition {
 
             String placeName = arc.getPlaceName();
             int actualPlaceState = newPlacesStates.get(placeName);
-            newPlacesStates.put(placeName, actualPlaceState-arc.getValue());
+            if (actualPlaceState < 0) {
+                newPlacesStates.put(placeName, -1); // support for infinity !!!
+            } else {
+                newPlacesStates.put(placeName, actualPlaceState-arc.getValue());
+            }
         }
         for (Arc arc : out) {
 
             String placeName = arc.getPlaceName();
             int actualPlaceState = newPlacesStates.get(placeName);
-            newPlacesStates.put(placeName, actualPlaceState+arc.getValue());
+            if (actualPlaceState < 0) {
+                newPlacesStates.put(placeName, -1); // support for infinity !!!
+            } else {
+                newPlacesStates.put(placeName, actualPlaceState+arc.getValue());
+            }
         }
 
         return newPlacesStates;

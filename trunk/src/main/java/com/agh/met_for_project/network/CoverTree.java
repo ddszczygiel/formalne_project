@@ -29,7 +29,7 @@ public class CoverTree {
     @PostConstruct
     public void setUp() {
 
-        networkStates = new HashSet<>();
+        networkStates = new LinkedHashSet<>();
         operationQueue = new LinkedList<>();
         networkTransitions = petriesNetwork.getTransitions();
     }
@@ -45,11 +45,13 @@ public class CoverTree {
 
     public void buildCoverTree() {
 
+        setUp();
+        setInitialNode();
         operationQueue.add(initialNode);
 
         while (!operationQueue.isEmpty()) {
 
-            NetworkState state = operationQueue.peek();     // can not be null because of while condition
+            NetworkState state = operationQueue.poll();     // can not be null because of while condition
             boolean noActiveTransitions = true;
 
             for (Transition t : networkTransitions) {
@@ -68,7 +70,14 @@ public class CoverTree {
                     if (networkStates.contains(newStatesString)) {
                         childState.setDuplicate(true);
                     } else {
-                        networkStates.add(getCoverStateString(childState.getStatesValues()));
+                        String coverStateString = getCoverStateString(childState.getStatesValues());
+                        if (coverStateString == null) {
+//                            networkStates.add(coverStateString);
+                            networkStates.add(newStatesString);
+                        } else {
+                            networkStates.add(coverStateString);
+                            updateMapValues(coverStateString, childState.getStates());
+                        }
                         // FIXME when there is a cover need to change childState states map !!!
                     }
                 }
@@ -77,6 +86,16 @@ public class CoverTree {
             if (noActiveTransitions) {
                 state.setDead(true);
             }
+        }
+    }
+
+    private void updateMapValues(String coverString, Map<String, Integer> actualStates) {
+
+        int i=0;
+        String[] values = coverString.split(NetworkState.SEPARATOR);
+        for (Map.Entry<String, Integer> entry : actualStates.entrySet()) {
+
+            entry.setValue(Integer.parseInt(values[i++]));
         }
     }
 
@@ -119,6 +138,21 @@ public class CoverTree {
         }
 
         return null;
+    }
+
+    public void displayTree() {
+
+        Queue<NetworkState> states = new LinkedList<>();
+        states.add(initialNode);
+
+        while (!states.isEmpty()) {
+
+            NetworkState current = states.peek();
+            for (NetworkState child : current.getNodes()) {
+                states.add(child);
+            }
+            System.out.println(current);
+        }
     }
 
 }
