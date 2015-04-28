@@ -4,7 +4,6 @@ package com.agh.met_for_project.network;
 import com.agh.met_for_project.model.NetworkState;
 import com.agh.met_for_project.model.Place;
 import com.agh.met_for_project.model.Transition;
-import com.google.common.base.Joiner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +12,8 @@ import java.util.*;
 
 @Component
 public class ReachTree {
+
+    private final int MAX_DEPTH = 20;
 
     @Autowired
     private PetriesNetwork petriesNetwork;
@@ -71,7 +72,11 @@ public class ReachTree {
 
                         state.getNodes().add(childState);   // adding reference to new state
                         states.put(newStateString, childState);
-                        operationQueue.add(childState);
+                        childState.getPath().add(newStateString);
+
+                        if (state.getPath().size() < MAX_DEPTH) {
+                            operationQueue.add(childState);
+                        }
                     }
                 }
             }
