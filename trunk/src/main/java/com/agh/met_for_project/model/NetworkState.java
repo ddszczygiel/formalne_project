@@ -20,13 +20,21 @@ public class NetworkState {
     private String executedTransitionName;
     private Map<String, Integer> states;
     private List<NetworkState> nodes;
+    private Set<String> path;
     private boolean duplicate;
     private boolean dead;
 
     public NetworkState() {
 
         states = new LinkedHashMap<>();   // to provide the same order of places in every new NetworkState as in Places list
+        path = new LinkedHashSet<>();
         nodes = new ArrayList<>();
+    }
+
+    public NetworkState(NetworkState parent) {
+
+        this();
+        path.addAll(parent.getPath());
     }
 
     public int[] getStatesValues() {
@@ -45,6 +53,15 @@ public class NetworkState {
     public String getStatesString() {
 
         return Joiner.on(SEPARATOR).join(states.values());
+    }
+
+    public Set<String> getPath() {
+        return path;
+    }
+
+    public NetworkState setPath(Set<String> path) {
+        this.path = path;
+        return this;
     }
 
     public String getExecutedTransitionName() {

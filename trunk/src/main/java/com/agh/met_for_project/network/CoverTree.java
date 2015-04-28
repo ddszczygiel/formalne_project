@@ -14,22 +14,16 @@ import java.util.*;
 @Component
 public class CoverTree {
 
-    private final int MAX_DEPTH = 20;
-
     @Autowired
     private PetriesNetwork petriesNetwork;
 
-    private Set<String> networkStates;
-//    private Map<String, Integer[]> networkStates; //FIXME check is it is not better solution !!
     private NetworkState initialNode;
     private List<Transition> networkTransitions;
     private Queue<NetworkState> operationQueue;
 
-
     @PostConstruct
     public void setUp() {
 
-        networkStates = new LinkedHashSet<>();
         operationQueue = new LinkedList<>();
         networkTransitions = petriesNetwork.getTransitions();
     }
@@ -40,7 +34,7 @@ public class CoverTree {
         for (Place p : petriesNetwork.getPlaces()) {
             initialNode.getStates().put(p.getName(), p.getState());
         }
-        networkStates.add(initialNode.getStatesString());
+        initialNode.getPath().add(initialNode.getStatesString());
     }
 
     public void buildCoverTree() {
@@ -59,27 +53,27 @@ public class CoverTree {
                 if (t.isExecutable(state.getStates())) {
 
                     noActiveTransitions = false;
-                    NetworkState childState = new NetworkState();
+                    NetworkState childState = new NetworkState(state);
                     state.getNodes().add(childState);
                     Map<String, Integer> newState = t.execute(state.getStates());
                     childState.getStates().putAll(newState);
                     childState.setExecutedTransitionName(t.getName());
                     String newStatesString = childState.getStatesString();
 
-                    if (networkStates.contains(newStatesString)) {
+                    if (childState.getPath().contains(newStatesString)) {
                         childState.setDuplicate(true);
                     } else {
 
-                        String coverStateString = getCoverStateString(childState.getStatesValues());
+                        operationQueue.add(childState);
+                        String coverStateString = getCoverStateString(childState.getStatesValues(), childState.getPath());
+
                         if (coverStateString == null) {
-                            networkStates.add(newStatesString);
+                            childState.getPath().add(newStatesString);
                         } else {
 
-                            operationQueue.add(childState);
-                            networkStates.add(coverStateString);
+                            childState.getPath().add(coverStateString);
                             updateMapValues(coverStateString, childState.getStates());
                         }
-                        // FIXME when there is a cover need to change childState states map !!!
                     }
                 }
             }
@@ -121,7 +115,7 @@ public class CoverTree {
             if (tab[i] < 0) {
                 continue;
             }
-            if (tab[i]<old[i]) {    //FIXME this condition is bad :(
+            if ((tab[i] < old[i]) || (old[i] < 0)) {
                 break;
             } else if (tab[i]>old[i]) {
                 tab[i] = -1;
@@ -140,9 +134,9 @@ public class CoverTree {
         return null;
     }
 
-    public String getCoverStateString(int[] state) {
+    public String getCoverStateString(int[] state, Set<String> path) {
 
-        for (String netState : networkStates) {
+        for (String netState : path) {
 
             String result = coverString(state, unpackStateString(netState));
             if (result != null) {
