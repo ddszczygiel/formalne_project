@@ -17,6 +17,7 @@ public class NetworkState {
 
     public static final String SEPARATOR = ",";
 
+    private String parentState;
     private String executedTransitionName;
     private Map<String, Integer> states;
     private List<NetworkState> nodes;
@@ -34,6 +35,7 @@ public class NetworkState {
     public NetworkState(NetworkState parent) {
 
         this();
+        parentState = parent.getStatesString();
         path.addAll(parent.getPath());
     }
 
@@ -53,6 +55,14 @@ public class NetworkState {
     public String getStatesString() {
 
         return Joiner.on(SEPARATOR).join(states.values());
+    }
+
+    public String getParentState() {
+        return parentState;
+    }
+
+    public void setParentState(String parentState) {
+        this.parentState = parentState;
     }
 
     public Set<String> getPath() {
@@ -108,7 +118,8 @@ public class NetworkState {
 
     public String toString() {
 
-        return String.format("STATE: %s\nEXECUTED TRANSITION: %s\nDUPLICATE %s\nDEAD %s\n", getStatesString(), executedTransitionName, duplicate, dead);
+        return String.format("PARENT: %s\nSTATE: %s\nEXECUTED TRANSITION: %s\nDUPLICATE %s\nDEAD %s\n",
+                parentState, getStatesString(), executedTransitionName, duplicate, dead);
     }
 
 }

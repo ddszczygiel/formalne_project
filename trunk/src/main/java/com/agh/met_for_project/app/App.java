@@ -27,10 +27,10 @@ public class App {
             CoverTree coverTree = (CoverTree) applicationContext.getBean("coverTree");
             ReachTree reachTree = (ReachTree) applicationContext.getBean("reachTree");
             networkLoader.loadNetwork(null);
-//            coverTree.buildCoverTree();
-//            coverTree.displayTree();
-            reachTree.buildReachTree();
-            reachTree.displayTree();
+            coverTree.buildCoverTree();
+            coverTree.displayTree();
+//            reachTree.buildReachTree();
+//            reachTree.displayTree();
 
         }
 

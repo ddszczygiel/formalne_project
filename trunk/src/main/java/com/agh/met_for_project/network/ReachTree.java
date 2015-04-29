@@ -20,7 +20,6 @@ public class ReachTree {
 
     private NetworkState initialNode;
     private Map<String, NetworkState> states;
-    private List<Transition> networkTransitions;
     private Queue<NetworkState> operationQueue;
 
     @PostConstruct
@@ -28,7 +27,6 @@ public class ReachTree {
 
         operationQueue = new LinkedList<>();
         states = new HashMap<>();
-        networkTransitions = petriesNetwork.getTransitions();
     }
 
     public void setInitialNode() {
@@ -53,7 +51,7 @@ public class ReachTree {
             NetworkState state = operationQueue.poll();     // can not be null because of while condition
             boolean noActiveTransitions = true;
 
-            for (Transition t : networkTransitions) {
+            for (Transition t : petriesNetwork.getTransitions()) {
 
                 if (t.isExecutable(state.getStates())) {
 
@@ -62,15 +60,14 @@ public class ReachTree {
                     Map<String, Integer> newState = t.execute(state.getStates());
                     childState.getStates().putAll(newState);
                     childState.setExecutedTransitionName(t.getName());
+                    state.getNodes().add(childState);
                     String newStateString = childState.getStatesString();
 
                     if (states.containsKey(newStateString)) {
 
-                        childState.setDuplicate(true);  // useless with next line :D
-                        state.getNodes().add(states.get(newStateString));  //adding reference to duplicated NetworkState - not the new one !!
+                        childState.setDuplicate(true);
                     } else {
 
-                        state.getNodes().add(childState);   // adding reference to new state
                         states.put(newStateString, childState);
                         childState.getPath().add(newStateString);
 
