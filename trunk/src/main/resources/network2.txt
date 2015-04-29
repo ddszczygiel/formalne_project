@@ -34,7 +34,7 @@ I;T1;P1;1
 I;T3;P2;1
 I;T2;P2;1
 
-
+# z zajec
 4
 5
 P1;2
@@ -56,3 +56,23 @@ I;T3;P3;1
 I;T5;P3;1
 O;T5;P4;1
 I;T4;P4;1
+
+
+#producent-konsument
+5
+4
+P1;1
+P2;0
+P3;1
+P4;0
+P5;0
+O;T1;P1;1
+I;T2;P1;1
+O;T2;P2;1
+I;T1;P2;1
+O;T3;P3;1
+I;T4;P3;1
+O;T4;P4;1
+I;T3;P4;1
+O;T3;P5;3
+I;T2;P5;2

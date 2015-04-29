@@ -13,7 +13,7 @@ import java.util.*;
 @Component
 public class ReachTree {
 
-    private final int MAX_DEPTH = 20;
+    private final int MAX_DEPTH = 30;
 
     @Autowired
     private PetriesNetwork petriesNetwork;
