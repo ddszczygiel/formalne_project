@@ -26,6 +26,7 @@ public class InArc implements Arc {
         return end.getName();
     }
 
+
     public void setValue(int value) {
         this.value = value;
     }

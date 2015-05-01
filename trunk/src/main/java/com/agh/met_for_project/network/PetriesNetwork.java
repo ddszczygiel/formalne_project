@@ -3,11 +3,11 @@ package com.agh.met_for_project.network;
 
 import com.agh.met_for_project.error.ErrorType;
 import com.agh.met_for_project.error.InvalidOperationException;
-import com.agh.met_for_project.model.InArc;
-import com.agh.met_for_project.model.OutArc;
-import com.agh.met_for_project.model.Place;
-import com.agh.met_for_project.model.Transition;
-import org.springframework.context.annotation.Lazy;
+import com.agh.met_for_project.model.*;
+import com.agh.met_for_project.model.service.ArcParams;
+import com.agh.met_for_project.model.service.ModifyArcWrapper;
+import com.agh.met_for_project.model.service.ModifyPlaceWrapper;
+import com.agh.met_for_project.model.service.ModifyTransitionWrapper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -65,143 +65,120 @@ public class PetriesNetwork {
         return null;
     }
 
-    public void addPlace(String name, int state) throws InvalidOperationException {
+    public void addPlace(Place p) throws InvalidOperationException {
 
-        if (getPlaceByName(name) != null) {
+        if (getPlaceByName(p.getName()) != null) {
             throw new InvalidOperationException(ErrorType.INVALID_PLACE_PARAMS);
         }
-        places.add(new Place(name, state));
+        places.add(p);
 
     }
 
-    public void addTransition(String name, int priority) throws InvalidOperationException {
+    public void addTransition(Transition t) throws InvalidOperationException {
 
-        if (getTransitionByName(name) != null) {
+        if (getTransitionByName(t.getName()) != null) {
             throw new InvalidOperationException(ErrorType.INVALID_TRANSITION_PARAMS);
         }
-        transitions.add(new Transition(name, priority));
+        transitions.add(t);
     }
 
     /**
      * Type can be "IN" - means connection FROM transition TO place or "OUT" - FORM place TO transition
-     * @param transitionName
-     * @param placeName
-     * @param type
-     * @param value
-     * @throws InvalidOperationException
      */
-    public void addArc(String transitionName, String placeName, String type, int value) throws InvalidOperationException {
+    public void addArc(ArcParams arc) throws InvalidOperationException {
 
-        Transition t = getTransitionByName(transitionName);
+        Transition t = getTransitionByName(arc.getTransitionName());
         if (t == null) {
             throw new InvalidOperationException(ErrorType.TRANSITION_NOT_EXIST);
         }
 
-        Place p = getPlaceByName(placeName);
+        Place p = getPlaceByName(arc.getPlaceName());
         if (p == null ) {
             throw new InvalidOperationException(ErrorType.PLACE_NOT_EXIST);
         }
 
-        if ( !"IN".equals(type) && !"OUT".equals(type)) {
+        if ( !"IN".equals(arc.getArcType()) && !"OUT".equals(arc.getArcType())) {
             throw new InvalidOperationException(ErrorType.INVALID_ARC_PARAMS);
         }
 
-        if (connectionExist(t, p.getName(), type)) {
+        if (getConnectionArc(t, p.getName(), arc.getArcType()) != null) {
             throw new InvalidOperationException(ErrorType.ARC_ALREADY_EXIST);
         }
 
-        if ("IN".equals(type)) {
+        if ("IN".equals(arc.getArcType())) {
 
             InArc inArc = new InArc();
-            inArc.setValue(value);
+            inArc.setValue(arc.getValue());
             inArc.setEnd(p);
             t.getOut().add(inArc);
         } else {
 
             OutArc outArc = new OutArc();
-            outArc.setValue(value);
+            outArc.setValue(arc.getValue());
             outArc.setBegin(p);
             t.getIn().add(outArc);
         }
     }
 
-    private boolean connectionExist(Transition t, String placeName, String type) {
+    private Arc getConnectionArc(Transition t, String placeName, String type) {
 
         if ("IN".equals(type)) {
             for (InArc inArc : t.getOut()) {
                 if (inArc.getEnd().getName().equals(placeName)) {
-                    return true;
+                    return inArc;
                 }
             }
         } else {
             for (OutArc outArc : t.getIn()) {
                 if (outArc.getBegin().getName().equals(placeName)) {
-                    return true;
+                    return outArc;
                 }
             }
         }
 
-        return false;
+        return null;
     }
 
-    public void modifyPlaceParams(String name, int state) throws InvalidOperationException {
+    public void modifyPlaceParams(ModifyPlaceWrapper params) throws InvalidOperationException {
 
-        Place p = getPlaceByName(name);
+        Place p = getPlaceByName(params.getActualName());
         if (p == null) {
             throw new InvalidOperationException(ErrorType.PLACE_NOT_EXIST);
         }
 
-        p.setName(name);
-        p.setState(state);
+        p.setName(params.getNewName());
+        p.setState(params.getNewState());
     }
 
-    public void modifyTransitionParams(String name, int priority) throws InvalidOperationException {
+    public void modifyTransitionParams(ModifyTransitionWrapper params) throws InvalidOperationException {
 
-        Transition t = getTransitionByName(name);
+        Transition t = getTransitionByName(params.getActualName());
         if (t == null) {
             throw new InvalidOperationException(ErrorType.TRANSITION_NOT_EXIST);
         }
 
-        t.setName(name);
-        t.setPriority(priority);
+        t.setName(params.getNewName());
+        t.setPriority(params.getNewPriority());
     }
 
-    public void modifyArcParams(String transitionName, String placeName, int value) throws InvalidOperationException {
+    public void modifyArcParams(ModifyArcWrapper params) throws InvalidOperationException {
 
-        Transition t = getTransitionByName(transitionName);
+        Transition t = getTransitionByName(params.getTransitionName());
         if (t == null) {
             throw new InvalidOperationException(ErrorType.TRANSITION_NOT_EXIST);
         }
 
-        if (getPlaceByName(placeName) == null ) {
+        Place p = getPlaceByName(params.getPlaceName());
+        if (p == null ) {
             throw new InvalidOperationException(ErrorType.PLACE_NOT_EXIST);
         }
 
-        // FIXME with additional argument only one loop would be needed - to discuss
-        boolean changed = false;
-        for (InArc inArc : t.getOut()) {
-            if (inArc.getEnd().getName().equals(placeName)) {
-
-                inArc.setValue(value);
-                changed = true;
-                break;
-            }
-        }
-
-        if (!changed) {
-            for (OutArc outArc : t.getIn()) {
-                if (outArc.getBegin().getName().equals(placeName)) {
-
-                    outArc.setValue(value);
-                    changed = true;
-                    break;
-                }
-            }
-        }
-
-        if (!changed) {
+        Arc arc = getConnectionArc(t, params.getPlaceName(), params.getType());
+        if (arc == null) {
             throw new InvalidOperationException(ErrorType.ARC_NOT_EXIST);
         }
+
+        arc.setValue(params.getNewValue());
     }
 
 }

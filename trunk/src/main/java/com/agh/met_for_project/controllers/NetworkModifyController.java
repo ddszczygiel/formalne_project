@@ -1,11 +1,17 @@
 package com.agh.met_for_project.controllers;
 
 import com.agh.met_for_project.error.InvalidOperationException;
+import com.agh.met_for_project.model.service.ArcParams;
+import com.agh.met_for_project.model.Place;
+import com.agh.met_for_project.model.Transition;
+import com.agh.met_for_project.model.service.ModifyArcWrapper;
+import com.agh.met_for_project.model.service.ModifyPlaceWrapper;
+import com.agh.met_for_project.model.service.ModifyTransitionWrapper;
 import com.agh.met_for_project.network.PetriesNetwork;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -14,28 +20,12 @@ public class NetworkModifyController {
     @Autowired
     private PetriesNetwork petriesNetwork;
 
-    @RequestMapping("/addplace")
-    public ResponseObject addPlace(@RequestParam(value = "name") String name,
-                                   @RequestParam(value = "state") int state) {
+    @RequestMapping(value = "/addplace", method = RequestMethod.POST)
+    public ResponseObject addPlace(@RequestBody Place p) {
 
         ResponseObject responseObject = new ResponseObject();
         try {
-            petriesNetwork.addPlace(name, state);
-            responseObject.setPayload(Boolean.TRUE);    //FIXME returning true when no error ???
-        } catch (InvalidOperationException e) {
-            responseObject.setErrorType(e.getErrorType());
-        }
-
-        return responseObject;
-    }
-
-    @RequestMapping("/addtransition")
-    public ResponseObject addTransition(@RequestParam(value="name") String name,
-                                        @RequestParam(value="priority") int priority) {
-
-        ResponseObject responseObject = new ResponseObject();
-        try {
-            petriesNetwork.addTransition(name, priority);
+            petriesNetwork.addPlace(p);
             responseObject.setPayload(Boolean.TRUE);
         } catch (InvalidOperationException e) {
             responseObject.setErrorType(e.getErrorType());
@@ -44,45 +34,12 @@ public class NetworkModifyController {
         return responseObject;
     }
 
-    @RequestMapping("/addarc")
-    public ResponseObject addArc(@RequestParam(value="transitionName") String transitionName,
-                                 @RequestParam(value="placeName") String placeName,
-                                 @RequestParam(value="arctype") String type,
-                                 @RequestParam(value="value") int value) {
+    @RequestMapping(value = "/addtransition", method = RequestMethod.POST)
+    public ResponseObject addTransition(@RequestBody Transition t) {
 
         ResponseObject responseObject = new ResponseObject();
         try {
-            petriesNetwork.addArc(transitionName, placeName, type, value);
-            responseObject.setPayload(Boolean.TRUE);    //FIXME returning true when no error ???
-        } catch (InvalidOperationException e) {
-            responseObject.setErrorType(e.getErrorType());
-        }
-
-        return responseObject;
-    }
-
-    @RequestMapping("/modifyplace")
-    public ResponseObject modifyPlace(@RequestParam(value="name") String name,
-                                      @RequestParam(value="state") int state) {
-
-        ResponseObject responseObject = new ResponseObject();
-        try {
-            petriesNetwork.modifyPlaceParams(name, state);
-            responseObject.setPayload(Boolean.TRUE);    //FIXME returning true when no error ???
-        } catch (InvalidOperationException e) {
-            responseObject.setErrorType(e.getErrorType());
-        }
-
-        return responseObject;
-    }
-
-    @RequestMapping("/modifytransition")
-    public ResponseObject modifyTransition(@RequestParam(value="name") String name,
-                                           @RequestParam(value="priority") int priority) {
-
-        ResponseObject responseObject = new ResponseObject();
-        try {
-            petriesNetwork.modifyTransitionParams(name, priority);
+            petriesNetwork.addTransition(t);
             responseObject.setPayload(Boolean.TRUE);
         } catch (InvalidOperationException e) {
             responseObject.setErrorType(e.getErrorType());
@@ -91,14 +48,102 @@ public class NetworkModifyController {
         return responseObject;
     }
 
-    @RequestMapping("/modifyarc")
-    public ResponseObject modifyArc(@RequestParam(value="transitionName") String transitionName,
-                                    @RequestParam(value="placeName") String placeName,
-                                    @RequestParam(value="value") int value) {
+    @RequestMapping(value = "/addarc", method = RequestMethod.POST)
+    public ResponseObject addArc(ArcParams arc) {
 
         ResponseObject responseObject = new ResponseObject();
         try {
-            petriesNetwork.modifyArcParams(transitionName, placeName, value);
+            petriesNetwork.addArc(arc);
+            responseObject.setPayload(Boolean.TRUE);
+        } catch (InvalidOperationException e) {
+            responseObject.setErrorType(e.getErrorType());
+        }
+
+        return responseObject;
+    }
+
+    @RequestMapping(value = "/addallplaces", method = RequestMethod.POST)
+    public ResponseObject addAllPlaces(@RequestBody List<Place> places) {
+
+        ResponseObject responseObject = new ResponseObject();
+        try {
+            for (Place p : places) {
+                petriesNetwork.addPlace(p);
+            }
+            responseObject.setPayload(Boolean.TRUE);
+        } catch (InvalidOperationException e) {
+            responseObject.setErrorType(e.getErrorType());
+        }
+
+        return responseObject;
+    }
+
+    @RequestMapping(value = "/addalltransitions", method = RequestMethod.POST)
+    public ResponseObject addAllTransitions(@RequestBody List<Transition> transitions) {
+
+        ResponseObject responseObject = new ResponseObject();
+        try {
+            for (Transition t : transitions) {
+                petriesNetwork.addTransition(t);
+            }
+            responseObject.setPayload(Boolean.TRUE);
+        } catch (InvalidOperationException e) {
+            responseObject.setErrorType(e.getErrorType());
+        }
+
+        return responseObject;
+    }
+
+    @RequestMapping(value = "/addallarcs", method = RequestMethod.POST)
+    public ResponseObject addAllArcs(@RequestBody List<ArcParams> arcs) {
+
+        ResponseObject responseObject = new ResponseObject();
+        try {
+            for (ArcParams arc : arcs) {
+                petriesNetwork.addArc(arc);
+            }
+            responseObject.setPayload(Boolean.TRUE);
+        } catch (InvalidOperationException e) {
+            responseObject.setErrorType(e.getErrorType());
+        }
+
+        return responseObject;
+    }
+
+    @RequestMapping(value = "/modifyplace", method = RequestMethod.POST)
+    public ResponseObject modifyPlace(ModifyPlaceWrapper params) {
+
+        ResponseObject responseObject = new ResponseObject();
+        try {
+            petriesNetwork.modifyPlaceParams(params);
+            responseObject.setPayload(Boolean.TRUE);
+        } catch (InvalidOperationException e) {
+            responseObject.setErrorType(e.getErrorType());
+        }
+
+        return responseObject;
+    }
+
+    @RequestMapping(value = "/modifytransition", method = RequestMethod.POST)
+    public ResponseObject modifyTransition(ModifyTransitionWrapper params) {
+
+        ResponseObject responseObject = new ResponseObject();
+        try {
+            petriesNetwork.modifyTransitionParams(params);
+            responseObject.setPayload(Boolean.TRUE);
+        } catch (InvalidOperationException e) {
+            responseObject.setErrorType(e.getErrorType());
+        }
+
+        return responseObject;
+    }
+
+    @RequestMapping(value = "/modifyarc", method = RequestMethod.POST)
+    public ResponseObject modifyArc(ModifyArcWrapper params) {
+
+        ResponseObject responseObject = new ResponseObject();
+        try {
+            petriesNetwork.modifyArcParams(params);
             responseObject.setPayload(Boolean.TRUE);
         } catch (InvalidOperationException e) {
             responseObject.setErrorType(e.getErrorType());
