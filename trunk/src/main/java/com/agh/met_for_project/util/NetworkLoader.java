@@ -52,7 +52,7 @@ public class NetworkLoader {
 
         for (int i = start; i<end; i++) {
             String[] params = parsed.get(i).split(VALUES_SEPARATOR);
-            petriesNetwork.addPlace(params[0], Integer.parseInt(params[1]));
+            petriesNetwork.addPlace(new Place(params[0], Integer.parseInt(params[1])));
         }
     }
 
@@ -61,7 +61,7 @@ public class NetworkLoader {
         for (int i = start; i<end; i++) {
 
             String[] params = parsed.get(i).split(VALUES_SEPARATOR);
-            petriesNetwork.addTransition(params[0], Integer.parseInt(params[1]));
+            petriesNetwork.addTransition(new Transition(params[0], Integer.parseInt(params[1])));
         }
     }
 
