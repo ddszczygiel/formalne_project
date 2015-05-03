@@ -46,7 +46,7 @@ public class NetworkModifyController {
     }
 
     @RequestMapping(value = "/addarc", method = RequestMethod.POST)
-    public ResponseObject addArc(ArcParams arc) {
+    public ResponseObject addArc(@RequestBody ArcParams arc) {
 
         ResponseObject responseObject = new ResponseObject();
         try {
@@ -108,7 +108,7 @@ public class NetworkModifyController {
     }
 
     @RequestMapping(value = "/modifyplace", method = RequestMethod.POST)
-    public ResponseObject modifyPlace(ModifyPlaceWrapper params) {
+    public ResponseObject modifyPlace(@RequestBody ModifyPlaceWrapper params) {
 
         ResponseObject responseObject = new ResponseObject();
         try {
@@ -122,7 +122,7 @@ public class NetworkModifyController {
     }
 
     @RequestMapping(value = "/modifytransition", method = RequestMethod.POST)
-    public ResponseObject modifyTransition(ModifyTransitionWrapper params) {
+    public ResponseObject modifyTransition(@RequestBody ModifyTransitionWrapper params) {
 
         ResponseObject responseObject = new ResponseObject();
         try {
@@ -136,7 +136,7 @@ public class NetworkModifyController {
     }
 
     @RequestMapping(value = "/modifyarc", method = RequestMethod.POST)
-    public ResponseObject modifyArc(ModifyArcWrapper params) {
+    public ResponseObject modifyArc(@RequestBody ModifyArcWrapper params) {
 
         ResponseObject responseObject = new ResponseObject();
         try {

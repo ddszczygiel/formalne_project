@@ -20,6 +20,7 @@ public class PetriesNetwork {
 
     private List<Place> places;
     private List<Transition> transitions;
+    private boolean modified = false;
 
     public List<Transition> getTransitions() {
         return transitions;
@@ -28,6 +29,10 @@ public class PetriesNetwork {
     public List<Place> getPlaces() {
 
         return places;
+    }
+
+    public boolean isModified() {
+        return modified;
     }
 
     @PostConstruct
@@ -70,8 +75,9 @@ public class PetriesNetwork {
         if (getPlaceByName(p.getName()) != null) {
             throw new InvalidOperationException(ErrorType.INVALID_PLACE_PARAMS);
         }
-        places.add(p);
 
+        places.add(p);
+        modified = true;
     }
 
     public void addTransition(Transition t) throws InvalidOperationException {
@@ -79,7 +85,9 @@ public class PetriesNetwork {
         if (getTransitionByName(t.getName()) != null) {
             throw new InvalidOperationException(ErrorType.INVALID_TRANSITION_PARAMS);
         }
+
         transitions.add(t);
+        modified = true;
     }
 
     /**
@@ -118,6 +126,8 @@ public class PetriesNetwork {
             outArc.setBegin(p);
             t.getIn().add(outArc);
         }
+
+        modified = true;
     }
 
     private Arc getConnectionArc(Transition t, String placeName, String type) {
@@ -148,6 +158,7 @@ public class PetriesNetwork {
 
         p.setName(params.getNewName());
         p.setState(params.getNewState());
+        modified = true;
     }
 
     public void modifyTransitionParams(ModifyTransitionWrapper params) throws InvalidOperationException {
@@ -159,6 +170,7 @@ public class PetriesNetwork {
 
         t.setName(params.getNewName());
         t.setPriority(params.getNewPriority());
+        modified = true;
     }
 
     public void modifyArcParams(ModifyArcWrapper params) throws InvalidOperationException {
@@ -179,6 +191,7 @@ public class PetriesNetwork {
         }
 
         arc.setValue(params.getNewValue());
+        modified = true;
     }
 
 }

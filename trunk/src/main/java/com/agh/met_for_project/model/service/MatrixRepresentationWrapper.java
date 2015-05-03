@@ -5,8 +5,8 @@ import java.util.List;
 
 public class MatrixRepresentationWrapper {
 
-    private List<List<Integer>> matrix;
-    private List<String> placeSequence;
+    private List<List<Integer>> matrix; // columns are representing transitions ; rows - places
+    private List<String> placeSequence; //
     private List<String> transitionSequence;
 
     public MatrixRepresentationWrapper(List<List<Integer>> matrix, List<String> placeSequence, List<String> transitionSequence) {

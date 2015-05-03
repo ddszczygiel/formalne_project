@@ -3,7 +3,6 @@ package com.agh.met_for_project.model;
 
 import com.google.common.base.Joiner;
 
-import javax.print.attribute.IntegerSyntax;
 import java.util.*;
 
 /**
@@ -35,7 +34,7 @@ public class NetworkState {
     public NetworkState(NetworkState parent) {
 
         this();
-        parentState = parent.getStatesString();
+        parentState = parent.getState();
         path.addAll(parent.getPath());
     }
 
@@ -52,7 +51,7 @@ public class NetworkState {
     }
 
     // FIXME check if needed
-    public String getStatesString() {
+    public String getState() {
 
         return Joiner.on(SEPARATOR).join(states.values());
     }
@@ -119,7 +118,7 @@ public class NetworkState {
     public String toString() {
 
         return String.format("PARENT: %s\nSTATE: %s\nEXECUTED TRANSITION: %s\nDUPLICATE %s\nDEAD %s\n",
-                parentState, getStatesString(), executedTransitionName, duplicate, dead);
+                parentState, getState(), executedTransitionName, duplicate, dead);
     }
 
 }

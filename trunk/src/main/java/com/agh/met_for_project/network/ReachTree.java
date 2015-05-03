@@ -35,7 +35,7 @@ public class ReachTree {
         for (Place p : petriesNetwork.getPlaces()) {
             initialNode.getStates().put(p.getName(), p.getState());
         }
-        String statesString = initialNode.getStatesString();
+        String statesString = initialNode.getState();
         initialNode.getPath().add(statesString);
         states.put(statesString, initialNode);
     }
@@ -61,7 +61,7 @@ public class ReachTree {
                     childState.getStates().putAll(newState);
                     childState.setExecutedTransitionName(t.getName());
                     state.getNodes().add(childState);
-                    String newStateString = childState.getStatesString();
+                    String newStateString = childState.getState();
 
                     if (states.containsKey(newStateString)) {
 
@@ -82,6 +82,15 @@ public class ReachTree {
                 state.setDead(true);
             }
         }
+    }
+
+    public Map<String, NetworkState> getStatesMap() {
+        return states;
+    }
+
+    public List<NetworkState> getStates() {
+
+        return new ArrayList<>(states.values());
     }
 
     public void displayTree() {

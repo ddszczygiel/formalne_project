@@ -14,7 +14,7 @@ import java.util.*;
 @Component
 public class CoverTree {
 
-    private final int MAX_DEPTH = 20;
+    private final int MAX_DEPTH = 30;
 
     @Autowired
     private PetriesNetwork petriesNetwork;
@@ -30,13 +30,18 @@ public class CoverTree {
         states = new HashMap<>();
     }
 
+    public List<NetworkState> getStates() {
+
+        return new ArrayList<>(states.values());
+    }
+
     public void setInitialNode() {
 
         initialNode = new NetworkState();
         for (Place p : petriesNetwork.getPlaces()) {
             initialNode.getStates().put(p.getName(), p.getState());
         }
-        String statesString = initialNode.getStatesString();
+        String statesString = initialNode.getState();
         initialNode.getPath().add(statesString);
         states.put(statesString, initialNode);
     }
@@ -62,7 +67,7 @@ public class CoverTree {
                     Map<String, Integer> newState = t.execute(state.getStates());
                     childState.getStates().putAll(newState);
                     childState.setExecutedTransitionName(t.getName());
-                    String newStatesString = childState.getStatesString();
+                    String newStatesString = childState.getState();
 
                     if (states.containsKey(newStatesString)) {
                         childState.setDuplicate(true);
