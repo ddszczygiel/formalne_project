@@ -1,12 +1,9 @@
 package com.agh.met_for_project.controllers;
 
 import com.agh.met_for_project.error.InvalidOperationException;
-import com.agh.met_for_project.model.service.ArcParams;
+import com.agh.met_for_project.model.service.*;
 import com.agh.met_for_project.model.Place;
 import com.agh.met_for_project.model.Transition;
-import com.agh.met_for_project.model.service.ModifyArcWrapper;
-import com.agh.met_for_project.model.service.ModifyPlaceWrapper;
-import com.agh.met_for_project.model.service.ModifyTransitionWrapper;
 import com.agh.met_for_project.network.PetriesNetwork;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -156,7 +153,7 @@ public class NetworkModifyController {
     public ResponseObject getNetwork() {
 
         ResponseObject responseObject = new ResponseObject();
-        responseObject.setPayload(petriesNetwork);
+        responseObject.setPayload(new NetworkWrapper(petriesNetwork));
 
         return responseObject;
     }
