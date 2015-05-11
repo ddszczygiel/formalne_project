@@ -158,4 +158,19 @@ public class NetworkModifyController {
         return responseObject;
     }
 
+    @RequestMapping("/executetransition")
+    public ResponseObject executeTransition(@RequestBody String transitionName) {
+
+        ResponseObject responseObject = new ResponseObject();
+        try {
+            petriesNetwork.executeTransition(transitionName);
+        } catch (InvalidOperationException e) {
+            responseObject.setErrorType(e.getErrorType());
+        }
+        responseObject.setPayload(new NetworkWrapper(petriesNetwork));
+
+        return responseObject;
+    }
+
+
 }

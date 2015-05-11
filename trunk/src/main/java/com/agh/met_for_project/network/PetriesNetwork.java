@@ -20,7 +20,7 @@ public class PetriesNetwork {
 
     private List<Place> places;
     private List<Transition> transitions;
-    private boolean modified = false;
+    private boolean modified = true;
 
     public List<Transition> getTransitions() {
         return transitions;
@@ -194,4 +194,17 @@ public class PetriesNetwork {
         modified = true;
     }
 
+    public void executeTransition(String transitionName) throws InvalidOperationException {
+
+        Transition t = getTransitionByName(transitionName);
+        if (t == null) {
+            throw new InvalidOperationException(ErrorType.INVALID_TRANSITION_PARAMS);
+        }
+
+        if (!t.isExecutable()) {
+            throw  new InvalidOperationException(ErrorType.TRANSITION_INEXECUTABLE);
+        }
+
+        t.execute();
+    }
 }
