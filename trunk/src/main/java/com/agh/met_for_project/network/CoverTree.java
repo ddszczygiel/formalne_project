@@ -74,7 +74,6 @@ public class CoverTree {
                     } else {
 
                         String coverState = getCoverState(childState.getStatesValues(), childState.getPath());
-
                         if (coverState == null) {
                             childState.getPath().add(newStatesString);
                             states.put(newStatesString, childState);
@@ -96,6 +95,8 @@ public class CoverTree {
                 state.setDead(true);
             }
         }
+
+        petriesNetwork.getStatus().setCoverTreeStatus(Status.TreeStatus.ACTUAL);
     }
 
     private void updateMapValues(String coverString, Map<String, Integer> actualStates) {

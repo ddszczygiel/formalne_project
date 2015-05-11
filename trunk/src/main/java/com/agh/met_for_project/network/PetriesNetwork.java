@@ -8,6 +8,7 @@ import com.agh.met_for_project.model.service.ArcParams;
 import com.agh.met_for_project.model.service.ModifyArcWrapper;
 import com.agh.met_for_project.model.service.ModifyPlaceWrapper;
 import com.agh.met_for_project.model.service.ModifyTransitionWrapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -18,9 +19,15 @@ import java.util.List;
 @Component
 public class PetriesNetwork {
 
+    @Autowired
+    private Status status;
+
     private List<Place> places;
     private List<Transition> transitions;
-    private boolean modified = true;
+
+    public Status getStatus() {
+        return status;
+    }
 
     public List<Transition> getTransitions() {
         return transitions;
@@ -29,10 +36,6 @@ public class PetriesNetwork {
     public List<Place> getPlaces() {
 
         return places;
-    }
-
-    public boolean isModified() {
-        return modified;
     }
 
     @PostConstruct
@@ -77,7 +80,7 @@ public class PetriesNetwork {
         }
 
         places.add(p);
-        modified = true;
+        status.networkModified();
     }
 
     public void addTransition(Transition t) throws InvalidOperationException {
@@ -87,7 +90,7 @@ public class PetriesNetwork {
         }
 
         transitions.add(t);
-        modified = true;
+        status.networkModified();
     }
 
     /**
@@ -127,7 +130,7 @@ public class PetriesNetwork {
             t.getIn().add(outArc);
         }
 
-        modified = true;
+        status.networkModified();
     }
 
     private Arc getConnectionArc(Transition t, String placeName, String type) {
@@ -158,7 +161,7 @@ public class PetriesNetwork {
 
         p.setName(params.getNewName());
         p.setState(params.getNewState());
-        modified = true;
+        status.networkModified();
     }
 
     public void modifyTransitionParams(ModifyTransitionWrapper params) throws InvalidOperationException {
@@ -170,7 +173,7 @@ public class PetriesNetwork {
 
         t.setName(params.getNewName());
         t.setPriority(params.getNewPriority());
-        modified = true;
+        status.networkModified();
     }
 
     public void modifyArcParams(ModifyArcWrapper params) throws InvalidOperationException {
@@ -191,7 +194,7 @@ public class PetriesNetwork {
         }
 
         arc.setValue(params.getNewValue());
-        modified = true;
+        status.networkModified();
     }
 
     public void executeTransition(String transitionName) throws InvalidOperationException {
@@ -206,5 +209,6 @@ public class PetriesNetwork {
         }
 
         t.execute();
+        status.networkModified();
     }
 }

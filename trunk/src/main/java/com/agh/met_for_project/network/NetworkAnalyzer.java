@@ -72,10 +72,9 @@ public class NetworkAnalyzer {
 
     public Boolean isZachowawczaXD() {
 
-        if (network.isModified()) {
-
+        if (network.getStatus().getReachTreeStatus() == Status.TreeStatus.NEED_UPDATE) {
+            reachTree.buildReachTree();
         }
-        reachTree.buildReachTree();
 
         List<NetworkState> states = new ArrayList<>(reachTree.getStatesMap().values());
         int[] values = states.get(0).getStatesValues();
@@ -97,7 +96,9 @@ public class NetworkAnalyzer {
             throw new InvalidOperationException(ErrorType.INVALID_PARAMS);
         }
 
-        reachTree.buildReachTree();
+        if (network.getStatus().getReachTreeStatus() == Status.TreeStatus.NEED_UPDATE) {
+            reachTree.buildReachTree();
+        }
 
         List<NetworkState> states = new ArrayList<>(reachTree.getStatesMap().values());
         int size = vector.length;
@@ -116,7 +117,10 @@ public class NetworkAnalyzer {
 
     public List<NetworkStateWrapper> getReachTree() {
 
-        reachTree.buildReachTree();
+        if (network.getStatus().getReachTreeStatus() == Status.TreeStatus.NEED_UPDATE) {
+            reachTree.buildReachTree();
+        }
+
         List<NetworkStateWrapper> wrap = new ArrayList<>();
         for (NetworkState state : reachTree.getStates()) {
             wrap.add(new NetworkStateWrapper(state));
@@ -126,7 +130,10 @@ public class NetworkAnalyzer {
 
     public List<NetworkStateWrapper> getCoverTree() {
 
-        coverTree.buildCoverTree();
+        if (network.getStatus().getCoverTreeStatus() == Status.TreeStatus.NEED_UPDATE) {
+            coverTree.buildCoverTree();
+        }
+
         List<NetworkStateWrapper> wrap = new ArrayList<>();
         for (NetworkState state : coverTree.getStates()) {
             wrap.add(new NetworkStateWrapper(state));
@@ -143,6 +150,5 @@ public class NetworkAnalyzer {
 
         return sum;
     }
-
 
 }

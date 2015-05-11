@@ -18,6 +18,9 @@ public class ReachTree {
     @Autowired
     private PetriesNetwork petriesNetwork;
 
+    @Autowired
+    private Status status;
+
     private NetworkState initialNode;
     private Map<String, NetworkState> states;
     private Queue<NetworkState> operationQueue;
@@ -64,7 +67,6 @@ public class ReachTree {
                     String newStateString = childState.getState();
 
                     if (states.containsKey(newStateString)) {
-
                         childState.setDuplicate(true);
                     } else {
 
@@ -82,6 +84,8 @@ public class ReachTree {
                 state.setDead(true);
             }
         }
+
+        petriesNetwork.getStatus().setReachTreeStatus(Status.TreeStatus.ACTUAL);
     }
 
     public Map<String, NetworkState> getStatesMap() {
