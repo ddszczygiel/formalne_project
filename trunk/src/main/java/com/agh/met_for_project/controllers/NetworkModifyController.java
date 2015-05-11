@@ -164,10 +164,10 @@ public class NetworkModifyController {
         ResponseObject responseObject = new ResponseObject();
         try {
             petriesNetwork.executeTransition(transitionName);
+            responseObject.setPayload(new NetworkWrapper(petriesNetwork));
         } catch (InvalidOperationException e) {
             responseObject.setErrorType(e.getErrorType());
         }
-        responseObject.setPayload(new NetworkWrapper(petriesNetwork));
 
         return responseObject;
     }
