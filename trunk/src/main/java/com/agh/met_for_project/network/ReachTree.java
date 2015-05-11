@@ -43,6 +43,10 @@ public class ReachTree {
         states.put(statesString, initialNode);
     }
 
+    public NetworkState getInitialNode() {
+        return initialNode;
+    }
+
     public void buildReachTree() {
 
         setUp();

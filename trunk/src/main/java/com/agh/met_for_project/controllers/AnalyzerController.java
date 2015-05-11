@@ -43,11 +43,24 @@ public class AnalyzerController {
     }
 
     @RequestMapping(value = "/bounededness")
-    public ResponseObject isBounededness(@RequestBody int[] vector){
+    public ResponseObject isBounededness(@RequestBody int k){
 
         ResponseObject response = new ResponseObject();
         try {
-            response.setPayload(analyzer.isBoundedness(vector));
+            response.setPayload(analyzer.isBoundedness(k));
+        } catch (InvalidOperationException e) {
+            response.setErrorType(e.getErrorType());
+        }
+
+        return response;
+    }
+
+    @RequestMapping(value = "/safe")
+    public ResponseObject isSafe(){
+
+        ResponseObject response = new ResponseObject();
+        try {
+            response.setPayload(analyzer.isBoundedness(1));
         } catch (InvalidOperationException e) {
             response.setErrorType(e.getErrorType());
         }

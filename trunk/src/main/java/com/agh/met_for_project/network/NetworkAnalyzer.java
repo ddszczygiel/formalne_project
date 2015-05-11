@@ -89,24 +89,43 @@ public class NetworkAnalyzer {
         return Boolean.TRUE;
     }
 
-    // czy jest ograniczona wzgledem podanego wektora
-    public Boolean isBoundedness(int[] vector) throws InvalidOperationException {
+//      na razie nie wiem ktora jest dobra - zostaja obie zebym nie zapomnial
+//    // czy jest ograniczona wzgledem podanego wektora
+//    public Boolean isBoundedness(int[] vector) throws InvalidOperationException {
+//
+//        if (vector.length != network.getPlaces().size()) {
+//            throw new InvalidOperationException(ErrorType.INVALID_PARAMS);
+//        }
+//
+//        reachTree.buildReachTree();
+//
+//        List<NetworkState> states = new ArrayList<>(reachTree.getStatesMap().values());
+//        int size = vector.length;
+//        for (NetworkState state : states) {
+//
+//            int[] actual = state.getStatesValues();
+//            for (int i=0; i<size; i++) {
+//                if (actual[i] > vector[i]) {
+//                    return Boolean.FALSE;
+//                }
+//            }
+//        }
+//
+//        return Boolean.TRUE;
+//    }
 
-        if (vector.length != network.getPlaces().size()) {
-            throw new InvalidOperationException(ErrorType.INVALID_PARAMS);
-        }
+    public Boolean isBoundedness(int k) throws InvalidOperationException {
 
         if (network.getStatus().getReachTreeStatus() == Status.TreeStatus.NEED_UPDATE) {
             reachTree.buildReachTree();
         }
 
         List<NetworkState> states = new ArrayList<>(reachTree.getStatesMap().values());
-        int size = vector.length;
         for (NetworkState state : states) {
 
             int[] actual = state.getStatesValues();
-            for (int i=0; i<size; i++) {
-                if (actual[i] > vector[i]) {
+            for (int i=0; i<actual.length; i++) {
+                if (actual[i] > k) {
                     return Boolean.FALSE;
                 }
             }
@@ -139,6 +158,23 @@ public class NetworkAnalyzer {
             wrap.add(new NetworkStateWrapper(state));
         }
         return wrap;
+    }
+
+    public Boolean isReversable() {
+
+        // assume that network is reversable if there exist at least one path with initial state !!!
+        reachTree.buildReachTree();
+
+        List<NetworkState> states = new ArrayList<>(reachTree.getStatesMap().values());
+        String initialState = reachTree.getInitialNode().getState();
+
+        for (NetworkState state : states) {
+            if (initialState.equals(state.getState()) && state.isDuplicate()) {
+                return Boolean.TRUE;
+            }
+        }
+
+        return Boolean.FALSE;
     }
 
     private int sumElements(int[] array) {
