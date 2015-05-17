@@ -55,6 +55,19 @@ public class AnalyzerController {
         return response;
     }
 
+    @RequestMapping(value = "/vectorbounededness")
+    public ResponseObject isBounededness(@RequestBody int[] vector){
+
+        ResponseObject response = new ResponseObject();
+        try {
+            response.setPayload(analyzer.isBoundedness(vector));
+        } catch (InvalidOperationException e) {
+            response.setErrorType(e.getErrorType());
+        }
+
+        return response;
+    }
+
     @RequestMapping(value = "/safe")
     public ResponseObject isSafe(){
 
@@ -73,6 +86,15 @@ public class AnalyzerController {
 
         ResponseObject response = new ResponseObject();
         response.setPayload(analyzer.isZachowawczaXD());
+
+        return response;
+    }
+
+    @RequestMapping(value = "/activetransitions")
+    public ResponseObject getActiveTransitions() {
+
+        ResponseObject response = new ResponseObject();
+        response.setPayload(analyzer.transitionActivity());
 
         return response;
     }

@@ -42,7 +42,7 @@ public class CoverTree {
             initialNode.getStates().put(p.getName(), p.getState());
         }
         String statesString = initialNode.getState();
-        initialNode.getPath().add(statesString);
+//        initialNode.getPath().add(statesString);  // FIXME: initial state is not added to list !!!
         states.put(statesString, initialNode);
     }
 
@@ -71,6 +71,7 @@ public class CoverTree {
 
                     if (states.containsKey(newStatesString)) {
                         childState.setDuplicate(true);
+                        childState.getPath().add(newStatesString);
                     } else {
 
                         String coverState = getCoverState(childState.getStatesValues(), childState.getPath());
@@ -149,7 +150,7 @@ public class CoverTree {
         return null;
     }
 
-    public String getCoverState(int[] state, Set<String> path) {
+    public String getCoverState(int[] state, List<String> path) {
 
         for (String netState : path) {
 

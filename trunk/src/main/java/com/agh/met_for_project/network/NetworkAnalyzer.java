@@ -89,30 +89,37 @@ public class NetworkAnalyzer {
         return Boolean.TRUE;
     }
 
-//      na razie nie wiem ktora jest dobra - zostaja obie zebym nie zapomnial
-//    // czy jest ograniczona wzgledem podanego wektora
-//    public Boolean isBoundedness(int[] vector) throws InvalidOperationException {
-//
-//        if (vector.length != network.getPlaces().size()) {
-//            throw new InvalidOperationException(ErrorType.INVALID_PARAMS);
-//        }
-//
-//        reachTree.buildReachTree();
-//
-//        List<NetworkState> states = new ArrayList<>(reachTree.getStatesMap().values());
-//        int size = vector.length;
-//        for (NetworkState state : states) {
-//
-//            int[] actual = state.getStatesValues();
-//            for (int i=0; i<size; i++) {
-//                if (actual[i] > vector[i]) {
-//                    return Boolean.FALSE;
-//                }
-//            }
-//        }
-//
-//        return Boolean.TRUE;
-//    }
+    public Boolean isBoundedness(int[] vector) throws InvalidOperationException {
+
+        if (vector.length != network.getPlaces().size()) {
+            throw new InvalidOperationException(ErrorType.INVALID_PARAMS);
+        }
+
+        if (network.getStatus().getReachTreeStatus() == Status.TreeStatus.NEED_UPDATE) {
+            reachTree.buildReachTree();
+        }
+
+        List<NetworkState> states = new ArrayList<>(reachTree.getStatesMap().values());
+        int size = vector.length;
+        int[] sumVector = new int[size];
+
+        for (NetworkState state : states) {
+
+            int[] actual = state.getStatesValues();
+            for (int i=0; i<size; i++) {
+                sumVector[i] = sumVector[i] + actual[i]*vector[i];
+            }
+        }
+
+        int firstSum = sumVector[0];
+        for (int i=1; i<size; i++) {
+            if (firstSum != sumVector[i]) {
+                return Boolean.FALSE;
+            }
+        }
+
+        return Boolean.TRUE;
+    }
 
     public Boolean isBoundedness(int k) throws InvalidOperationException {
 
@@ -132,6 +139,22 @@ public class NetworkAnalyzer {
         }
 
         return Boolean.TRUE;
+    }
+
+    public List<String> transitionActivity() {
+
+        if (network.getStatus().getReachTreeStatus() == Status.TreeStatus.NEED_UPDATE) {
+            reachTree.buildReachTree();
+        }
+
+        List<NetworkState> states = new ArrayList<>(reachTree.getStatesMap().values());
+        Set<String> activeTransitions = new HashSet<>();
+        for (NetworkState state : states) {
+            activeTransitions.add(state.getExecutedTransitionName());
+        }
+        activeTransitions.remove(null); // from the initial state
+
+        return new ArrayList<>(activeTransitions);
     }
 
     public List<NetworkStateWrapper> getReachTree() {
@@ -162,19 +185,36 @@ public class NetworkAnalyzer {
 
     public Boolean isReversable() {
 
-        // assume that network is reversable if there exist at least one path with initial state !!!
-        reachTree.buildReachTree();
+        if (network.getStatus().getReachTreeStatus() == Status.TreeStatus.NEED_UPDATE) {
+            reachTree.buildReachTree();
+        }
 
         List<NetworkState> states = new ArrayList<>(reachTree.getStatesMap().values());
         String initialState = reachTree.getInitialNode().getState();
+        List<String> hasInitialState = new ArrayList<>();
 
         for (NetworkState state : states) {
-            if (initialState.equals(state.getState()) && state.isDuplicate()) {
-                return Boolean.TRUE;
+            if (state.getPath().contains(initialState)) {   // state has initialState on its path so return is possible
+                hasInitialState.add(state.getState());
             }
         }
 
-        return Boolean.FALSE;
+        for (NetworkState state : states) {
+            if (!state.getPath().contains(initialState)) {
+                boolean contain = false;
+                for (String stateString : hasInitialState) {    // check if on path exist on of states that have initialState
+                    if (state.getPath().contains(stateString)) {
+                        contain = true;
+                        break;
+                    }
+                }
+                if (!contain) {
+                    return Boolean.FALSE;
+                }
+            }
+        }
+
+        return Boolean.TRUE;
     }
 
     private int sumElements(int[] array) {

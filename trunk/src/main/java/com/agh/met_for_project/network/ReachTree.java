@@ -39,7 +39,7 @@ public class ReachTree {
             initialNode.getStates().put(p.getName(), p.getState());
         }
         String statesString = initialNode.getState();
-        initialNode.getPath().add(statesString);
+//        initialNode.getPath().add(statesString);      // FIXME: initial state is not added to list !!!
         states.put(statesString, initialNode);
     }
 
@@ -70,13 +70,12 @@ public class ReachTree {
                     state.getNodes().add(childState);
                     String newStateString = childState.getState();
 
+                    childState.getPath().add(newStateString);
                     if (states.containsKey(newStateString)) {
                         childState.setDuplicate(true);
                     } else {
 
                         states.put(newStateString, childState);
-                        childState.getPath().add(newStateString);
-
                         if (state.getPath().size() < MAX_DEPTH) {
                             operationQueue.add(childState);
                         }

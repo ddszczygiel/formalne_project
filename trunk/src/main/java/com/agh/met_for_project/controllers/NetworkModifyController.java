@@ -159,7 +159,8 @@ public class NetworkModifyController {
     }
 
     @RequestMapping("/executetransition")
-    public ResponseObject executeTransition(@RequestBody String transitionName) {
+//    public ResponseObject executeTransition(@RequestBody String transitionName) {
+    public ResponseObject executeTransition(@RequestParam String transitionName) {
 
         ResponseObject responseObject = new ResponseObject();
         try {
