@@ -96,18 +96,16 @@ public class NetworkState {
         return dead;
     }
 
-    public NetworkState setDead(boolean dead) {
+    public void setDead(boolean dead) {
         this.dead = dead;
-        return this;
     }
 
     public boolean isDuplicate() {
         return duplicate;
     }
 
-    public NetworkState setDuplicate(boolean duplicate) {
+    public void setDuplicate(boolean duplicate) {
         this.duplicate = duplicate;
-        return this;
     }
 
     public String toString() {
