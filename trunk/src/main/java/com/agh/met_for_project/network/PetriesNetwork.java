@@ -22,6 +22,8 @@ public class PetriesNetwork {
     @Autowired
     private Status status;
 
+    private boolean prioritySimulation;
+
     private List<Place> places;
     private List<Transition> transitions;
 
@@ -36,6 +38,14 @@ public class PetriesNetwork {
     public List<Place> getPlaces() {
 
         return places;
+    }
+
+    public boolean isPrioritySimulation() {
+        return prioritySimulation;
+    }
+
+    public void setPrioritySimulation(boolean prioritySimulation) {
+        this.prioritySimulation = prioritySimulation;
     }
 
     @PostConstruct
@@ -211,4 +221,33 @@ public class PetriesNetwork {
         t.execute();
         status.networkModified();
     }
+
+    public List<String> simulationStep() {
+
+        List<String> possibleTransitions = new ArrayList<>();
+        Transition maxPriorityTransition = transitions.get(0);  // dummy :(
+
+
+        for (Transition t : transitions) {
+
+            if (t.isExecutable()) {
+                if (!prioritySimulation) {
+                    possibleTransitions.add(t.getName());
+                } else {
+                    // if there would be many transitions to execute with same priority the first one is returned
+                    if (t.getPriority() > maxPriorityTransition.getPriority()) {
+                        maxPriorityTransition = t;
+                    }
+                }
+            }
+        }
+
+        if (prioritySimulation) {
+            possibleTransitions.add(maxPriorityTransition.getName());
+        }
+
+        return possibleTransitions;
+    }
+
+
 }

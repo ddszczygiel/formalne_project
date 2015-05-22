@@ -173,5 +173,14 @@ public class NetworkModifyController {
         return responseObject;
     }
 
+    @RequestMapping("/possibletransitions")
+    public ResponseObject getPossibleTransitions() {
+
+        ResponseObject responseObject = new ResponseObject();
+        responseObject.setPayload(petriesNetwork.simulationStep());
+
+        return responseObject;
+    }
+
 
 }
