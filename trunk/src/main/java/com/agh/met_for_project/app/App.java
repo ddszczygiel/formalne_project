@@ -24,13 +24,13 @@ public class App {
 
             NetworkLoader networkLoader = (NetworkLoader) applicationContext.getBean("networkLoader");
 //            NetworkAnalyzer networkAnalyzer = (NetworkAnalyzer) applicationContext.getBean("networkAnalyzer");
-            CoverTree coverTree = (CoverTree) applicationContext.getBean("coverTree");
-            ReachTree reachTree = (ReachTree) applicationContext.getBean("reachTree");
+//            CoverTree coverTree = (CoverTree) applicationContext.getBean("coverTree");
+//            ReachTree reachTree = (ReachTree) applicationContext.getBean("reachTree");
             networkLoader.loadNetwork(null);
 //            coverTree.buildCoverTree();
 //            coverTree.displayTree();
-            reachTree.buildReachTree();
-            reachTree.displayTree();
+//            reachTree.buildReachTree();
+//            reachTree.displayTree();
 //            NetworkAnalyzer analyzer = (NetworkAnalyzer) applicationContext.getBean("networkAnalyzer");
 //            System.out.println(analyzer.getMatrixModel().getMatrix());
 
