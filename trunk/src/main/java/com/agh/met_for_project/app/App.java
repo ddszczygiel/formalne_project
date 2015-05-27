@@ -8,12 +8,24 @@ import com.agh.met_for_project.network.ReachTree;
 import com.agh.met_for_project.util.NetworkLoader;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.embedded.MultipartConfigFactory;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+
+import javax.servlet.MultipartConfigElement;
 
 @SpringBootApplication
 @ComponentScan("com.agh.met_for_project")
 public class App {
+
+    @Bean
+    MultipartConfigElement multipartConfigElement() {
+        MultipartConfigFactory factory = new MultipartConfigFactory();
+        factory.setMaxFileSize("5120MB");
+        factory.setMaxRequestSize("5120MB");
+        return factory.createMultipartConfig();
+    }
 
         public static void main(String[] args) throws InvalidOperationException {
 

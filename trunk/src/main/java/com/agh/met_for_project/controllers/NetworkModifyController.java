@@ -7,11 +7,14 @@ import com.agh.met_for_project.model.Transition;
 import com.agh.met_for_project.network.PetriesNetwork;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.*;
 import java.util.List;
 
 
 @RestController
+@RequestMapping(value="/api")
 public class NetworkModifyController {
 
     @Autowired
@@ -159,8 +162,8 @@ public class NetworkModifyController {
     }
 
     @RequestMapping("/executetransition")
-//    public ResponseObject executeTransition(@RequestBody String transitionName) {
-    public ResponseObject executeTransition(@RequestParam String transitionName) {
+    public ResponseObject executeTransition(@RequestBody String transitionName) {
+    //public ResponseObject executeTransition(@RequestParam String transitionName) {
 
         ResponseObject responseObject = new ResponseObject();
         try {
@@ -180,6 +183,20 @@ public class NetworkModifyController {
         responseObject.setPayload(petriesNetwork.simulationStep());
 
         return responseObject;
+    }
+
+    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    public String uploadFile(@RequestParam(value = "file", required = false) MultipartFile file) {
+
+        System.out.println(file.getOriginalFilename());
+
+        try {
+            String network = new String(file.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return "deal with it :D";
     }
 
 
