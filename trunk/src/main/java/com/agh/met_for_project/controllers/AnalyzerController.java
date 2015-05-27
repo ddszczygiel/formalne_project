@@ -82,6 +82,15 @@ public class AnalyzerController {
         return response;
     }
 
+    @RequestMapping(value = "/reversibility")
+    public ResponseObject isReversable() {
+
+        ResponseObject responseObject = new ResponseObject();
+        responseObject.setPayload(analyzer.isReversible());
+
+        return responseObject;
+    }
+
     @RequestMapping(value = "/zachowawczosc")
     public ResponseObject isZachowawcza() {
 

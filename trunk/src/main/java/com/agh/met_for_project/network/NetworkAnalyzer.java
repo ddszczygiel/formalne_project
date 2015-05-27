@@ -183,7 +183,7 @@ public class NetworkAnalyzer {
         return wrap;
     }
 
-    public Boolean isReversable() {
+    public Boolean isReversible() {
 
         if (network.getStatus().getReachTreeStatus() == Status.TreeStatus.NEED_UPDATE) {
             reachTree.buildReachTree();

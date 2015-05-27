@@ -199,5 +199,15 @@ public class NetworkModifyController {
         return "deal with it :D";
     }
 
+    @RequestMapping("/prioritysimulation")
+    public ResponseObject setPriorityMode(@RequestBody boolean val) {
+
+        ResponseObject responseObject = new ResponseObject();
+        petriesNetwork.setPrioritySimulation(val);
+        responseObject.setPayload(Boolean.TRUE);
+
+        return responseObject;
+    }
+
 
 }
