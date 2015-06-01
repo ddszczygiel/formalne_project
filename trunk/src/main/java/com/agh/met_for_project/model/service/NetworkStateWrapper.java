@@ -8,8 +8,8 @@ public class NetworkStateWrapper {
     private String parentState;
     private String state;
     private String executedTransitionName;
-    private boolean isDuplicate;
-    private boolean isDead;
+    private Boolean isDuplicate;
+    private Boolean isDead;
 
     public NetworkStateWrapper(NetworkState state) {
 
@@ -40,4 +40,14 @@ public class NetworkStateWrapper {
         return isDead;
     }
 
+    @Override
+    public String toString() {
+        return "NetworkStateWrapper{" +
+                "parentState='" + parentState + '\'' +
+                ", state='" + state + '\'' +
+                ", executedTransitionName='" + executedTransitionName + '\'' +
+                ", isDuplicate=" + isDuplicate +
+                ", isDead=" + isDead +
+                '}';
+    }
 }

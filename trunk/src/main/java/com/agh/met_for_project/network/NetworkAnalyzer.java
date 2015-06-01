@@ -76,7 +76,7 @@ public class NetworkAnalyzer {
             reachTree.buildReachTree();
         }
 
-        List<NetworkState> states = new ArrayList<>(reachTree.getStatesMap().values());
+        List<NetworkState> states = reachTree.getStates();
         int[] values = states.get(0).getStatesValues();
         int sum = sumElements(values);
 
@@ -99,7 +99,7 @@ public class NetworkAnalyzer {
             reachTree.buildReachTree();
         }
 
-        List<NetworkState> states = new ArrayList<>(reachTree.getStatesMap().values());
+        List<NetworkState> states = reachTree.getStates();
         int size = vector.length;
         int[] sumVector = new int[size];
 
@@ -127,7 +127,7 @@ public class NetworkAnalyzer {
             reachTree.buildReachTree();
         }
 
-        List<NetworkState> states = new ArrayList<>(reachTree.getStatesMap().values());
+        List<NetworkState> states = reachTree.getStates();
         for (NetworkState state : states) {
 
             int[] actual = state.getStatesValues();
@@ -147,7 +147,7 @@ public class NetworkAnalyzer {
             reachTree.buildReachTree();
         }
 
-        List<NetworkState> states = new ArrayList<>(reachTree.getStatesMap().values());
+        List<NetworkState> states = reachTree.getStates();
         Set<String> activeTransitions = new HashSet<>();
         for (NetworkState state : states) {
             activeTransitions.add(state.getExecutedTransitionName());
@@ -189,7 +189,7 @@ public class NetworkAnalyzer {
             reachTree.buildReachTree();
         }
 
-        List<NetworkState> states = new ArrayList<>(reachTree.getStatesMap().values());
+        List<NetworkState> states = reachTree.getStates();
         String initialState = reachTree.getInitialNode().getState();
         List<String> hasInitialState = new ArrayList<>();
 

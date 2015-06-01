@@ -37,7 +37,7 @@ public class App {
             NetworkLoader networkLoader = (NetworkLoader) applicationContext.getBean("networkLoader");
 //            NetworkAnalyzer networkAnalyzer = (NetworkAnalyzer) applicationContext.getBean("networkAnalyzer");
 //            CoverTree coverTree = (CoverTree) applicationContext.getBean("coverTree");
-//            ReachTree reachTree = (ReachTree) applicationContext.getBean("reachTree");
+            ReachTree reachTree = (ReachTree) applicationContext.getBean("reachTree");
             networkLoader.loadNetwork(null);
 //            coverTree.buildCoverTree();
 //            coverTree.displayTree();

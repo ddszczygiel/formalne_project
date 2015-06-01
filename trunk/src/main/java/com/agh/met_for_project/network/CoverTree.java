@@ -20,19 +20,21 @@ public class CoverTree {
     private PetriesNetwork petriesNetwork;
 
     private NetworkState initialNode;
-    private Map<String, NetworkState> states;
+    private Set<String> states;
+    private List<NetworkState> allStates;
     private Queue<NetworkState> operationQueue;
 
     @PostConstruct
     public void setUp() {
 
         operationQueue = new LinkedList<>();
-        states = new HashMap<>();
+        states = new HashSet<>();
+        allStates = new ArrayList<>();
     }
 
     public List<NetworkState> getStates() {
 
-        return new ArrayList<>(states.values());
+        return allStates;
     }
 
     public void setInitialNode() {
@@ -43,7 +45,8 @@ public class CoverTree {
         }
         String statesString = initialNode.getState();
 //        initialNode.getPath().add(statesString);  // FIXME: initial state is not added to list !!!
-        states.put(statesString, initialNode);
+        states.add(statesString);
+        allStates.add(initialNode);
     }
 
     public void buildCoverTree() {
@@ -68,8 +71,8 @@ public class CoverTree {
                     childState.getStates().putAll(newState);
                     childState.setExecutedTransitionName(t.getName());
                     String newStatesString = childState.getState();
-
-                    if (states.containsKey(newStatesString)) {
+                    allStates.add(childState);
+                    if (states.contains(newStatesString)) {
                         childState.setDuplicate(true);
                         childState.getPath().add(newStatesString);
                     } else {
@@ -77,12 +80,12 @@ public class CoverTree {
                         String coverState = getCoverState(childState.getStatesValues(), childState.getPath());
                         if (coverState == null) {
                             childState.getPath().add(newStatesString);
-                            states.put(newStatesString, childState);
+                            states.add(newStatesString);
                         } else {
 
                             childState.getPath().add(coverState);
                             updateMapValues(coverState, childState.getStates());
-                            states.put(coverState, childState);
+                            states.add(coverState);
                         }
 
                         if (state.getPath().size() < MAX_DEPTH) {

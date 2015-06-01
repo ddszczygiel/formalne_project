@@ -22,14 +22,16 @@ public class ReachTree {
     private Status status;
 
     private NetworkState initialNode;
-    private Map<String, NetworkState> states;
+    private Set<String> states;
+    private List<NetworkState> allStates;
     private Queue<NetworkState> operationQueue;
 
     @PostConstruct
     public void setUp() {
 
         operationQueue = new LinkedList<>();
-        states = new HashMap<>();
+        states = new HashSet<>();
+        allStates = new ArrayList<>();
     }
 
     public void setInitialNode() {
@@ -40,7 +42,8 @@ public class ReachTree {
         }
         String statesString = initialNode.getState();
 //        initialNode.getPath().add(statesString);      // FIXME: initial state is not added to list !!!
-        states.put(statesString, initialNode);
+        states.add(statesString);
+        allStates.add(initialNode);
     }
 
     public NetworkState getInitialNode() {
@@ -69,13 +72,13 @@ public class ReachTree {
                     childState.setExecutedTransitionName(t.getName());
                     state.getNodes().add(childState);
                     String newStateString = childState.getState();
-
+                    allStates.add(childState);
                     childState.getPath().add(newStateString);
-                    if (states.containsKey(newStateString)) {
+                    if (states.contains(newStateString)) {
                         childState.setDuplicate(true);
                     } else {
 
-                        states.put(newStateString, childState);
+                        states.add(newStateString);
                         if (state.getPath().size() < MAX_DEPTH) {
                             operationQueue.add(childState);
                         }
@@ -91,13 +94,9 @@ public class ReachTree {
         petriesNetwork.getStatus().setReachTreeStatus(Status.TreeStatus.ACTUAL);
     }
 
-    public Map<String, NetworkState> getStatesMap() {
-        return states;
-    }
-
     public List<NetworkState> getStates() {
 
-        return new ArrayList<>(states.values());
+        return this.allStates;
     }
 
     public void displayTree() {
