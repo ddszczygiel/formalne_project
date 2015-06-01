@@ -23,9 +23,18 @@ public class PetriesNetwork {
     private Status status;
 
     private boolean prioritySimulation;
+    private int maxDepth = 20;
 
     private List<Place> places;
     private List<Transition> transitions;
+
+    public int getMaxDepth() {
+        return maxDepth;
+    }
+
+    public void setMaxDepth(int maxDepth) {
+        this.maxDepth = maxDepth;
+    }
 
     public Status getStatus() {
         return status;

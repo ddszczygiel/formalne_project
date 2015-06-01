@@ -14,8 +14,6 @@ import java.util.*;
 @Component
 public class CoverTree {
 
-    private final int MAX_DEPTH = 30;
-
     @Autowired
     private PetriesNetwork petriesNetwork;
 
@@ -88,7 +86,7 @@ public class CoverTree {
                             states.add(coverState);
                         }
 
-                        if (state.getPath().size() < MAX_DEPTH) {
+                        if (state.getPath().size() < petriesNetwork.getMaxDepth()) {
                             operationQueue.add(childState);
                         }
                     }

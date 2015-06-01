@@ -13,8 +13,6 @@ import java.util.*;
 @Component
 public class ReachTree {
 
-    private final int MAX_DEPTH = 30;
-
     @Autowired
     private PetriesNetwork petriesNetwork;
 
@@ -79,7 +77,7 @@ public class ReachTree {
                     } else {
 
                         states.add(newStateString);
-                        if (state.getPath().size() < MAX_DEPTH) {
+                        if (state.getPath().size() < petriesNetwork.getMaxDepth()) {
                             operationQueue.add(childState);
                         }
                     }

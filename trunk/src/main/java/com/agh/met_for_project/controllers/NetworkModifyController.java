@@ -214,5 +214,15 @@ public class NetworkModifyController {
         return responseObject;
     }
 
+    @RequestMapping("/maxdepthvalue")
+    public ResponseObject setMaxDepth(@RequestBody int depth) {
+
+        ResponseObject responseObject = new ResponseObject();
+        petriesNetwork.setMaxDepth(depth);
+        responseObject.setPayload(Boolean.TRUE);
+
+        return responseObject;
+    }
+
 
 }
