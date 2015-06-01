@@ -1,10 +1,12 @@
 package com.agh.met_for_project.controllers;
 
+import com.agh.met_for_project.error.ErrorType;
 import com.agh.met_for_project.error.InvalidOperationException;
 import com.agh.met_for_project.model.service.*;
 import com.agh.met_for_project.model.Place;
 import com.agh.met_for_project.model.Transition;
 import com.agh.met_for_project.network.PetriesNetwork;
+import com.agh.met_for_project.util.NetworkLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +21,9 @@ public class NetworkModifyController {
 
     @Autowired
     private PetriesNetwork petriesNetwork;
+
+    @Autowired
+    private NetworkLoader networkLoader;
 
     @RequestMapping(value = "/addplace", method = RequestMethod.POST)
     public ResponseObject addPlace(@RequestBody Place p) {
@@ -186,17 +191,17 @@ public class NetworkModifyController {
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public String uploadFile(@RequestParam(value = "file", required = false) MultipartFile file) {
+    public ResponseObject uploadFile(@RequestParam(value = "file", required = false) MultipartFile file) throws InvalidOperationException {
 
-        System.out.println(file.getOriginalFilename());
-
+        ResponseObject responseObject = new ResponseObject();
         try {
-            String network = new String(file.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
+            networkLoader.loadNetwork(file.getInputStream());
+            responseObject.setPayload(Boolean.TRUE);
+        } catch (IOException | InvalidOperationException e) {
+            responseObject.setErrorType(ErrorType.LOAD_NETWORK_ERROR);
         }
 
-        return "deal with it :D";
+        return responseObject;
     }
 
     @RequestMapping("/prioritysimulation")

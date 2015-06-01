@@ -215,7 +215,7 @@ public class PetriesNetwork {
         }
 
         if (!t.isExecutable()) {
-            throw  new InvalidOperationException(ErrorType.TRANSITION_INEXECUTABLE);
+            throw  new InvalidOperationException(ErrorType.TRANSITION_UNEXECUTABLE);
         }
 
         t.execute();

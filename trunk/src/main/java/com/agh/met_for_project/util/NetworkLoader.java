@@ -26,9 +26,9 @@ public class NetworkLoader {
     private final String NETWORK_FILE = "/network.txt";
     private final String VALUES_SEPARATOR = ";";
 
-    public void loadNetwork(String filePath) throws InvalidOperationException {
+    public void loadNetwork(InputStream inputStream) throws InvalidOperationException {
 
-        List<String> parsed = getLinesFromFile(filePath);
+        List<String> parsed = getLinesFromFile(inputStream);
         try {
             if (!parsed.isEmpty()) {
 
@@ -130,13 +130,13 @@ public class NetworkLoader {
         saveNetworkToFile(lines);
     }
 
-    public List<String> getLinesFromFile(String filePath) {
+    private List<String> getLinesFromFile(InputStream inputStream) {
 
         List<String> lines = new ArrayList<>();
         try {
 
-            BufferedReader file = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(NETWORK_FILE)));
-//            BufferedReader file = new BufferedReader(new InputStreamReader(new FileInputStream(new File(filePath))));
+//            BufferedReader file = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(NETWORK_FILE)));
+            BufferedReader file = new BufferedReader(new InputStreamReader(inputStream));
             String line;
 
             while ((line = file.readLine()) != null) {
