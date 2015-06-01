@@ -97,6 +97,11 @@ public class ReachTree {
         return this.allStates;
     }
 
+    public Set<String> getUniqueStates() {
+
+        return this.states;
+    }
+
     public void displayTree() {
 
         Queue<NetworkState> states = new LinkedList<>();

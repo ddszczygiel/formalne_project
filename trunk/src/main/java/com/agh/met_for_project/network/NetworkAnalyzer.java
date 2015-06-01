@@ -127,8 +127,7 @@ public class NetworkAnalyzer {
             reachTree.buildReachTree();
         }
 
-        List<NetworkState> states = reachTree.getStates();
-        for (NetworkState state : states) {
+        for (NetworkState state : reachTree.getStates()) {
 
             int[] actual = state.getStatesValues();
             for (int i=0; i<actual.length; i++) {
@@ -191,30 +190,21 @@ public class NetworkAnalyzer {
 
         List<NetworkState> states = reachTree.getStates();
         String initialState = reachTree.getInitialNode().getState();
-        List<String> hasInitialState = new ArrayList<>();
+        Set<String> initialAccessible = new HashSet<>();
 
         for (NetworkState state : states) {
-            if (state.getPath().contains(initialState)) {   // state has initialState on its path so return is possible
-                hasInitialState.add(state.getState());
-            }
-        }
-
-        for (NetworkState state : states) {
-            if (!state.getPath().contains(initialState)) {
-                boolean contain = false;
-                for (String stateString : hasInitialState) {    // check if on path exist on of states that have initialState
-                    if (state.getPath().contains(stateString)) {
-                        contain = true;
-                        break;
-                    }
-                }
-                if (!contain) {
-                    return Boolean.FALSE;
+            if (state.getPath().contains(initialState)) {   // state has initialState on its path so return is possible from all its path members !!!
+                for (String pathMember: state.getPath()) {
+                    initialAccessible.add(pathMember);
                 }
             }
         }
 
-        return Boolean.TRUE;
+        if (initialAccessible.size() == reachTree.getUniqueStates().size()) {
+            return Boolean.TRUE;
+        }
+
+        return Boolean.FALSE;
     }
 
     private int sumElements(int[] array) {

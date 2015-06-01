@@ -135,8 +135,8 @@ public class NetworkLoader {
         List<String> lines = new ArrayList<>();
         try {
 
-//            BufferedReader file = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(NETWORK_FILE)));
-            BufferedReader file = new BufferedReader(new InputStreamReader(inputStream));
+            BufferedReader file = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(NETWORK_FILE)));
+//            BufferedReader file = new BufferedReader(new InputStreamReader(inputStream));
             String line;
 
             while ((line = file.readLine()) != null) {

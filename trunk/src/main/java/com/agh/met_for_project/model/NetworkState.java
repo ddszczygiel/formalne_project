@@ -43,8 +43,7 @@ public class NetworkState {
         int[] tab = new int[states.size()];
         int i = 0;
         for (Integer val : states.values()) {
-            tab[i] = val;
-            i++;
+            tab[i++] = val;
         }
 
         return tab;
