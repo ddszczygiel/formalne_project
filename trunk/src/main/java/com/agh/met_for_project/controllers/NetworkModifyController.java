@@ -157,6 +157,34 @@ public class NetworkModifyController {
         return responseObject;
     }
 
+    @RequestMapping(value = "/removeplace", method = RequestMethod.POST)
+        public ResponseObject removePlace(@RequestBody String placeName) {
+
+        ResponseObject responseObject = new ResponseObject();
+        try {
+            petriesNetwork.removePlace(placeName);
+            responseObject.setPayload(Boolean.TRUE);
+        } catch (InvalidOperationException e) {
+            responseObject.setErrorType(e.getErrorType());
+        }
+
+        return responseObject;
+    }
+
+    @RequestMapping(value = "/removetransition", method = RequestMethod.POST)
+    public ResponseObject removeTransition(@RequestBody String transitionName) {
+
+        ResponseObject responseObject = new ResponseObject();
+        try {
+            petriesNetwork.removeTransition(transitionName);
+            responseObject.setPayload(Boolean.TRUE);
+        } catch (InvalidOperationException e) {
+            responseObject.setErrorType(e.getErrorType());
+        }
+
+        return responseObject;
+    }
+
     @RequestMapping("/network")
     public ResponseObject getNetwork() {
 

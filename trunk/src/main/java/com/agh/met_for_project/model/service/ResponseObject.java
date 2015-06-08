@@ -1,4 +1,4 @@
-package com.agh.met_for_project.controllers;
+package com.agh.met_for_project.model.service;
 
 
 import com.agh.met_for_project.error.ErrorType;

@@ -9,7 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 @Component
 public class CoverTree {
@@ -58,37 +64,35 @@ public class CoverTree {
             NetworkState state = operationQueue.poll();     // can not be null because of while condition
             boolean noActiveTransitions = true;
 
-            for (Transition t : petriesNetwork.getTransitions()) {
+            List<Transition> executableTransitions = petriesNetwork.possibleTransitions(state.getStates());
+            for (Transition t : executableTransitions) {
 
-                if (t.isExecutable(state.getStates())) {
+                noActiveTransitions = false;
+                NetworkState childState = new NetworkState(state);
+                state.getNodes().add(childState);
+                Map<String, Integer> newState = t.execute(state.getStates());
+                childState.getStates().putAll(newState);
+                childState.setExecutedTransitionName(t.getName());
+                String newStatesString = childState.getState();
+                allStates.add(childState);
+                if (states.contains(newStatesString)) {
+                    childState.setDuplicate(true);
+                    childState.getPath().add(newStatesString);
+                } else {
 
-                    noActiveTransitions = false;
-                    NetworkState childState = new NetworkState(state);
-                    state.getNodes().add(childState);
-                    Map<String, Integer> newState = t.execute(state.getStates());
-                    childState.getStates().putAll(newState);
-                    childState.setExecutedTransitionName(t.getName());
-                    String newStatesString = childState.getState();
-                    allStates.add(childState);
-                    if (states.contains(newStatesString)) {
-                        childState.setDuplicate(true);
+                    String coverState = getCoverState(childState.getStatesValues(), childState.getPath());
+                    if (coverState == null) {
                         childState.getPath().add(newStatesString);
+                        states.add(newStatesString);
                     } else {
 
-                        String coverState = getCoverState(childState.getStatesValues(), childState.getPath());
-                        if (coverState == null) {
-                            childState.getPath().add(newStatesString);
-                            states.add(newStatesString);
-                        } else {
+                        childState.getPath().add(coverState);
+                        updateMapValues(coverState, childState.getStates());
+                        states.add(coverState);
+                    }
 
-                            childState.getPath().add(coverState);
-                            updateMapValues(coverState, childState.getStates());
-                            states.add(coverState);
-                        }
-
-                        if (state.getPath().size() < petriesNetwork.getMaxDepth()) {
-                            operationQueue.add(childState);
-                        }
+                    if (state.getPath().size() < petriesNetwork.getMaxDepth()) {
+                        operationQueue.add(childState);
                     }
                 }
             }
@@ -103,7 +107,7 @@ public class CoverTree {
 
     private void updateMapValues(String coverString, Map<String, Integer> actualStates) {
 
-        int i=0;
+        int i = 0;
         String[] values = coverString.split(NetworkState.SEPARATOR);
         for (Map.Entry<String, Integer> entry : actualStates.entrySet()) {
 
@@ -115,7 +119,7 @@ public class CoverTree {
 
         String[] values = state.split(NetworkState.SEPARATOR);
         int[] tab = new int[values.length];
-        for (int i=0; i<values.length; i++) {
+        for (int i = 0; i < values.length; i++) {
             tab[i] = Integer.parseInt(values[i]);
         }
 
@@ -127,14 +131,14 @@ public class CoverTree {
 
         int[] tab = cover.clone();
         int i;
-        for (i=0; i<tab.length; i++) {
+        for (i = 0; i < tab.length; i++) {
 
             if (tab[i] < 0) {
                 continue;
             }
             if ((tab[i] < old[i]) || (old[i] < 0)) {
                 break;
-            } else if (tab[i]>old[i]) {
+            } else if (tab[i] > old[i]) {
                 tab[i] = -1;
             }
         }
@@ -142,7 +146,7 @@ public class CoverTree {
         if (i == tab.length) {
 
             String[] sVal = new String[tab.length];
-            for (int j=0; j<tab.length; j++) {
+            for (int j = 0; j < tab.length; j++) {
                 sVal[j] = Integer.toString(tab[j]);
             }
             return Joiner.on(NetworkState.SEPARATOR).join(sVal);

@@ -2,6 +2,7 @@ package com.agh.met_for_project.controllers;
 
 
 import com.agh.met_for_project.error.InvalidOperationException;
+import com.agh.met_for_project.model.service.ResponseObject;
 import com.agh.met_for_project.network.NetworkAnalyzer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;

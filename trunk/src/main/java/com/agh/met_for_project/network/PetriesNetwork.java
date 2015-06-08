@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -154,6 +155,70 @@ public class PetriesNetwork {
         status.networkModified();
     }
 
+    public void removeTransition(String name) throws InvalidOperationException {
+
+        if (getTransitionByName(name) == null) {
+            throw new InvalidOperationException(ErrorType.TRANSITION_NOT_EXIST);
+        }
+
+        Iterator<Transition> transitionIterator = transitions.iterator();
+        while (transitionIterator.hasNext()) {
+
+            Transition t = transitionIterator.next();
+            if (name.equals(t.getName())) {
+
+                transitionIterator.remove();
+                break;
+            }
+        }
+
+        status.networkModified();
+    }
+
+    public void removePlace(String name) throws InvalidOperationException {
+
+        if (getPlaceByName(name) == null) {
+            throw new InvalidOperationException(ErrorType.PLACE_NOT_EXIST);
+        }
+
+        for (Transition t : transitions) {
+
+            Iterator<InArc> it = t.getOut().iterator();
+            while (it.hasNext()) {
+
+                InArc inArc = it.next();
+                if (name.equals(inArc.getEnd().getName())) {
+
+                    it.remove();
+                    break;
+                }
+            }
+
+            Iterator<OutArc> it2 = t.getIn().iterator();
+            while (it2.hasNext()) {
+
+                OutArc outArc = it2.next();
+                if (name.equals(outArc.getBegin().getName())) {
+                    it2.remove();
+                    break;
+                }
+            }
+        }
+
+
+        Iterator<Place> placeIterator = places.iterator();
+        while (placeIterator.hasNext()) {
+
+            Place p = placeIterator.next();
+            if (name.equals(p.getName())) {
+                placeIterator.remove();
+                break;
+            }
+        }
+
+        status.networkModified();
+    }
+
     private Arc getConnectionArc(Transition t, String placeName, String type) {
 
         if ("IN".equals(type)) {
@@ -247,7 +312,7 @@ public class PetriesNetwork {
 
         if (isPrioritySimulation()) {
 
-            Transition maxPriorityTransition = getMaxPriorityTransisiotn(possibleTransitions);
+            Transition maxPriorityTransition = getMaxPriorityTransition(possibleTransitions);
             if (maxPriorityTransition != null) {
                 transitionWrapperList.add(new PossibleTransitionWrapper(maxPriorityTransition.getName(), maxPriorityTransition.getPriority()));
             }
@@ -261,7 +326,7 @@ public class PetriesNetwork {
         return transitionWrapperList;
     }
 
-    private Transition getMaxPriorityTransisiotn(List<Transition> transitions) {
+    private Transition getMaxPriorityTransition(List<Transition> transitions) {
 
         int maxPriority = Integer.MIN_VALUE;
         Transition maxPriorityTransition = null;
@@ -291,7 +356,7 @@ public class PetriesNetwork {
 
         if (isPrioritySimulation()) {
 
-            Transition maxPriorityTransition = getMaxPriorityTransisiotn(possibleTransitions);
+            Transition maxPriorityTransition = getMaxPriorityTransition(possibleTransitions);
             if (maxPriorityTransition != null) {
                 returnList.add(maxPriorityTransition);
             }
