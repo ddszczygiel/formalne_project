@@ -112,4 +112,13 @@ public class AnalyzerController {
         return response;
     }
 
+    @RequestMapping(value = "/activeplaces")
+    public ResponseObject getActivePlaces() {
+
+        ResponseObject response = new ResponseObject();
+        response.setPayload(analyzer.placesActivity());
+
+        return response;
+    }
+
 }

@@ -37,15 +37,15 @@ public class App {
 
             NetworkLoader networkLoader = (NetworkLoader) applicationContext.getBean("networkLoader");
 //            NetworkAnalyzer networkAnalyzer = (NetworkAnalyzer) applicationContext.getBean("networkAnalyzer");
-//            CoverTree coverTree = (CoverTree) applicationContext.getBean("coverTree");
+            CoverTree coverTree = (CoverTree) applicationContext.getBean("coverTree");
             PetriesNetwork network = (PetriesNetwork) applicationContext.getBean("petriesNetwork");
             ReachTree reachTree = (ReachTree) applicationContext.getBean("reachTree");
             networkLoader.loadNetwork(null);
 //            network.setPrioritySimulation(true);
-//            coverTree.buildCoverTree();
-//            coverTree.displayTree();
-            reachTree.buildReachTree();
-            reachTree.displayTree();
+            coverTree.buildCoverTree();
+            coverTree.displayTree();
+//            reachTree.buildReachTree();
+//            reachTree.displayTree();
 //            NetworkAnalyzer analyzer = (NetworkAnalyzer) applicationContext.getBean("networkAnalyzer");
 //            System.out.println(analyzer.getMatrixModel().getMatrix());
 
