@@ -185,7 +185,7 @@ public class NetworkModifyController {
     public ResponseObject getPossibleTransitions() {
 
         ResponseObject responseObject = new ResponseObject();
-        responseObject.setPayload(petriesNetwork.simulationStep());
+        responseObject.setPayload(petriesNetwork.possibleTransitions());
 
         return responseObject;
     }

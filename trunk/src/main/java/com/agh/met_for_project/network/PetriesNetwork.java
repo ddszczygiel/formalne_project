@@ -8,12 +8,14 @@ import com.agh.met_for_project.model.service.ArcParams;
 import com.agh.met_for_project.model.service.ModifyArcWrapper;
 import com.agh.met_for_project.model.service.ModifyPlaceWrapper;
 import com.agh.met_for_project.model.service.ModifyTransitionWrapper;
+import com.agh.met_for_project.model.service.PossibleTransitionWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @Component
@@ -231,28 +233,69 @@ public class PetriesNetwork {
         status.networkModified();
     }
 
-    public List<String> simulationStep() {
+    // this is method for simulation button
+    public List<PossibleTransitionWrapper> possibleTransitions() {
 
-        List<String> possibleTransitions = new ArrayList<>();
-        Transition maxPriorityTransition = transitions.get(0);  // dummy :(
-
+        List<Transition> possibleTransitions = new ArrayList<>();
+        List<PossibleTransitionWrapper> transitionWrapperList = new ArrayList<>();
 
         for (Transition t : transitions) {
-
             if (t.isExecutable()) {
-                if (!prioritySimulation) {
-                    possibleTransitions.add(t.getName());
-                } else {
-                    // if there would be many transitions to execute with same priority the first one is returned
-                    if (t.getPriority() > maxPriorityTransition.getPriority()) {
-                        maxPriorityTransition = t;
-                    }
-                }
+                possibleTransitions.add(t);
             }
         }
 
-        if (prioritySimulation) {
-            possibleTransitions.add(maxPriorityTransition.getName());
+        if (isPrioritySimulation()) {
+
+            Transition maxPriorityTransition = getMaxPriorityTransisiotn(possibleTransitions);
+            if (maxPriorityTransition != null) {
+                transitionWrapperList.add(new PossibleTransitionWrapper(maxPriorityTransition.getName(), maxPriorityTransition.getPriority()));
+            }
+        } else {
+
+            for (Transition t : possibleTransitions) {
+                transitionWrapperList.add(new PossibleTransitionWrapper(t.getName(), t.getPriority()));
+            }
+        }
+
+        return transitionWrapperList;
+    }
+
+    private Transition getMaxPriorityTransisiotn(List<Transition> transitions) {
+
+        int maxPriority = Integer.MIN_VALUE;
+        Transition maxPriorityTransition = null;
+
+        for (Transition t : transitions) {
+            if (t.getPriority() > maxPriority) {
+                maxPriority = t.getPriority();
+                maxPriorityTransition = t;
+            }
+        }
+
+        // if null is returned, there are no executable transitions !
+        return maxPriorityTransition;
+    }
+
+    // this is method for reach and cover tree
+    public List<Transition> possibleTransitions(Map<String, Integer> actualPlacesStates) {
+
+        List<Transition> possibleTransitions = new ArrayList<>();
+        List<Transition> returnList = new ArrayList<>();
+
+        for (Transition t : transitions) {
+            if (t.isExecutable(actualPlacesStates)) {
+                possibleTransitions.add(t);
+            }
+        }
+
+        if (isPrioritySimulation()) {
+
+            Transition maxPriorityTransition = getMaxPriorityTransisiotn(possibleTransitions);
+            if (maxPriorityTransition != null) {
+                returnList.add(maxPriorityTransition);
+            }
+            return returnList;
         }
 
         return possibleTransitions;

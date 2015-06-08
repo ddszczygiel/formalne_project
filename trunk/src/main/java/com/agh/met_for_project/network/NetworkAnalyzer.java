@@ -89,11 +89,21 @@ public class NetworkAnalyzer {
         return Boolean.TRUE;
     }
 
-    public Boolean isBoundedness(int[] vector) throws InvalidOperationException {
+    public Boolean isBoundedness(List<String> vectorValues) throws InvalidOperationException {
 
-        if (vector.length != network.getPlaces().size()) {
+        if (vectorValues.size() != network.getPlaces().size()) {
             throw new InvalidOperationException(ErrorType.INVALID_PARAMS);
         }
+
+        int[] vector = new int[vectorValues.size()];
+        try {
+            for (int i=0; i<vector.length; i++) {
+                vector[i] = Integer.parseInt(vectorValues.get(i));
+            }
+        } catch (NumberFormatException e) {
+            throw new InvalidOperationException(ErrorType.INVALID_PARAMS);
+        }
+
 
         if (network.getStatus().getReachTreeStatus() == Status.TreeStatus.NEED_UPDATE) {
             reachTree.buildReachTree();
