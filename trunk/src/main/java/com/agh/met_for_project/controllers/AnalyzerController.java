@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping(value="/api")
@@ -57,11 +59,11 @@ public class AnalyzerController {
     }
 
     @RequestMapping(value = "/vectorbounededness")
-    public ResponseObject isBounededness(@RequestBody int[] vector){
+    public ResponseObject isBounededness(@RequestBody List<String> valuesVector){
 
         ResponseObject response = new ResponseObject();
         try {
-            response.setPayload(analyzer.isBoundedness(vector));
+            response.setPayload(analyzer.isBoundedness(valuesVector));
         } catch (InvalidOperationException e) {
             response.setErrorType(e.getErrorType());
         }
