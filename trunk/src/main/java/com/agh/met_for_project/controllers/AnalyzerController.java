@@ -116,7 +116,7 @@ public class AnalyzerController {
     public ResponseObject getMaxPlacesState() {
 
         ResponseObject response = new ResponseObject();
-        response.setPayload(analyzer.checkPlacesBoundness());
+        response.setPayload(analyzer.checkPlacesBoundedness());
 
         return response;
     }
