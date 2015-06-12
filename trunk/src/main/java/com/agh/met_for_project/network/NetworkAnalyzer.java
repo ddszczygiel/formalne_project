@@ -2,18 +2,14 @@ package com.agh.met_for_project.network;
 
 import com.agh.met_for_project.error.ErrorType;
 import com.agh.met_for_project.error.InvalidOperationException;
-import com.agh.met_for_project.model.Arc;
-import com.agh.met_for_project.model.NetworkState;
-import com.agh.met_for_project.model.Place;
-import com.agh.met_for_project.model.Transition;
+import com.agh.met_for_project.model.*;
 import com.agh.met_for_project.model.service.MatrixRepresentationWrapper;
 import com.agh.met_for_project.model.service.NetworkStateWrapper;
-import com.agh.met_for_project.model.service.PlaceActivity;
-import com.agh.met_for_project.model.service.PlaceActivityWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 
 @Component
@@ -117,9 +113,12 @@ public class NetworkAnalyzer {
 
         for (NetworkState state : states) {
 
-            int[] actual = state.getStatesValues();
-            for (int i=0; i<size; i++) {
-                sumVector[i] = sumVector[i] + actual[i]*vector[i];
+            if (!state.isDuplicate()) {
+
+                int[] actual = state.getStatesValues();
+                for (int i=0; i<size; i++) {
+                    sumVector[i] = sumVector[i] + actual[i]*vector[i];
+                }
             }
         }
 
@@ -219,27 +218,32 @@ public class NetworkAnalyzer {
         return Boolean.FALSE;
     }
 
-    public List<PlaceActivityWrapper> placesActivity() {
+    public List<Pair> checkPlacesBoundedness() {
 
         if (network.getStatus().getReachTreeStatus() == Status.TreeStatus.NEED_UPDATE) {
             reachTree.buildReachTree();
         }
 
-        List<NetworkState> states = reachTree.getStates();
-        Map<String, PlaceActivityWrapper> placeActivity = new HashMap<>();
+        Map<String, Integer> placesMaxState = new HashMap<>();
         for (Place p : network.getPlaces()) {
-            placeActivity.put(p.getName(), new PlaceActivityWrapper(p.getName(), PlaceActivity.DEAD));
+            placesMaxState.put(p.getName(), 0);
         }
 
-        for (NetworkState state : states) {
-            for (Map.Entry<String, Integer> entry : state.getStates().entrySet()) {
-                if (entry.getValue() > 0) {
-                    placeActivity.get(entry.getKey()).setPlaceActivity(PlaceActivity.ALIVE);
+        for (NetworkState state : reachTree.getStates()) {
+
+            for (Entry<String, Integer> entry : state.getStates().entrySet()) {
+                if (placesMaxState.get(entry.getKey()) < entry.getValue()) {
+                    placesMaxState.put(entry.getKey(), entry.getValue());
                 }
             }
         }
 
-        return new ArrayList<>(placeActivity.values());
+        List<Pair> maxPlaceStateList = new ArrayList<>();
+        for (Entry<String, Integer> entry : placesMaxState.entrySet()) {
+            maxPlaceStateList.add(new Pair(entry.getKey(), entry.getValue()));
+        }
+
+        return maxPlaceStateList;
     }
 
     private int sumElements(int[] array) {

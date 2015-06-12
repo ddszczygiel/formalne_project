@@ -112,11 +112,11 @@ public class AnalyzerController {
         return response;
     }
 
-    @RequestMapping(value = "/activeplaces")
-    public ResponseObject getActivePlaces() {
+    @RequestMapping(value = "/maxplacesstate")
+    public ResponseObject getMaxPlacesState() {
 
         ResponseObject response = new ResponseObject();
-        response.setPayload(analyzer.placesActivity());
+        response.setPayload(analyzer.checkPlacesBoundness());
 
         return response;
     }

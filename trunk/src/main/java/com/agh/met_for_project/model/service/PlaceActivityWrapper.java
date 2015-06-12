@@ -1,6 +1,8 @@
 package com.agh.met_for_project.model.service;
 
 
+import com.agh.met_for_project.model.PlaceActivity;
+
 public class PlaceActivityWrapper {
 
     private String placeName;
