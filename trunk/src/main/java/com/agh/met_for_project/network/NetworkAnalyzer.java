@@ -205,17 +205,44 @@ public class NetworkAnalyzer {
 
         for (NetworkState state : states) {
             if (state.getPath().contains(initialState)) {   // state has initialState on its path so return is possible from all its path members !!!
-                for (String pathMember: state.getPath()) {
-                    initialAccessible.add(pathMember);
-                }
+                initialAccessible.addAll(state.getPath());
             }
         }
 
-        if (initialAccessible.size() == reachTree.getUniqueStates().size()) {
-            return Boolean.TRUE;
+        for (NetworkState state : reachTree.getStates()) {
+
+            boolean found = false;
+            if (initialAccessible.contains(state.getState())) {
+                continue;
+            } else {
+
+                Queue<NetworkState> childs = new LinkedList<>();
+                childs.addAll(state.getNodes());
+                Set<String> checked = new HashSet<>();
+                while (childs.size() > 0) {
+
+                    NetworkState child = childs.poll();
+                    if (checked.contains(child.getState())) {
+                        continue;
+                    }
+
+                    if (initialAccessible.contains(child.getState())) {
+
+                        found = true;
+                        break;
+                    } else {
+                        childs.addAll(child.getNodes());
+                        checked.add(child.getState());
+                    }
+                }
+            }
+
+            if (!found) {
+                return Boolean.FALSE;
+            }
         }
 
-        return Boolean.FALSE;
+        return Boolean.TRUE;
     }
 
     public List<Pair> checkPlacesBoundedness() {
@@ -244,6 +271,61 @@ public class NetworkAnalyzer {
         }
 
         return maxPlaceStateList;
+    }
+
+    public Boolean checkNetworkLivness() {
+
+        if (network.getStatus().getCoverTreeStatus() == Status.TreeStatus.NEED_UPDATE) {
+            coverTree.buildCoverTree();
+        }
+
+        Set<String> aliveStatesChildes = new HashSet<>();
+        int count = 0;
+
+        for (NetworkState state : coverTree.getStates()) {
+
+            if (state.getExecutedTransitions().size() == network.getTransitions().size()) {
+
+                for (String st : state.getPath()) {
+                    aliveStatesChildes.add(st);
+                }
+            }
+        }
+
+        for (NetworkState state : coverTree.getStates()) {
+
+            boolean found = false;
+            if (aliveStatesChildes.contains(state.getState())) {
+                continue;
+            } else {
+
+                Queue<NetworkState> childs = new LinkedList<>();
+                childs.addAll(state.getNodes());
+                Set<String> checked = new HashSet<>();
+                while (childs.size() > 0) {
+
+                    NetworkState child = childs.poll();
+                    if (checked.contains(child.getState())) {
+                        continue;
+                    }
+
+                    if (aliveStatesChildes.contains(child.getState())) {
+
+                        found = true;
+                        break;
+                    } else {
+                        childs.addAll(child.getNodes());
+                        checked.add(child.getState());
+                    }
+                }
+            }
+
+            if (!found) {
+                return Boolean.FALSE;
+            }
+        }
+
+        return Boolean.TRUE;
     }
 
     private int sumElements(int[] array) {

@@ -9,13 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class CoverTree {
@@ -48,7 +42,7 @@ public class CoverTree {
             initialNode.getStates().put(p.getName(), p.getState());
         }
         String statesString = initialNode.getState();
-//        initialNode.getPath().add(statesString);  // FIXME: initial state is not added to list !!!
+        initialNode.getPath().add(statesString);
         states.add(statesString);
         allStates.add(initialNode);
     }
@@ -65,34 +59,17 @@ public class CoverTree {
             boolean noActiveTransitions = true;
 
             List<Transition> executableTransitions = petriesNetwork.possibleTransitions(state.getStates());
-            for (Transition t : executableTransitions) {
+            if (!executableTransitions.isEmpty()) {
 
                 noActiveTransitions = false;
-                NetworkState childState = new NetworkState(state);
-                state.getNodes().add(childState);
-                Map<String, Integer> newState = t.execute(state.getStates());
-                childState.getStates().putAll(newState);
-                childState.setExecutedTransitionName(t.getName());
-                String newStatesString = childState.getState();
-                allStates.add(childState);
-                if (states.contains(newStatesString)) {
-                    childState.setDuplicate(true);
-                    childState.getPath().add(newStatesString);
+                if (petriesNetwork.isPrioritySimulation()) {
+
+                    Transition rand = executableTransitions.get(new Random().nextInt(executableTransitions.size()));
+                    executeTransition(state, rand);
                 } else {
 
-                    String coverState = getCoverState(childState.getStatesValues(), childState.getPath());
-                    if (coverState == null) {
-                        childState.getPath().add(newStatesString);
-                        states.add(newStatesString);
-                    } else {
-
-                        childState.getPath().add(coverState);
-                        updateMapValues(coverState, childState.getStates());
-                        states.add(coverState);
-                    }
-
-                    if (state.getPath().size() < petriesNetwork.getMaxDepth()) {
-                        operationQueue.add(childState);
+                    for (Transition t : executableTransitions) {
+                        executeTransition(state, t);
                     }
                 }
             }
@@ -103,6 +80,38 @@ public class CoverTree {
         }
 
         petriesNetwork.getStatus().setCoverTreeStatus(Status.TreeStatus.ACTUAL);
+    }
+
+    public void executeTransition(NetworkState state, Transition t) {
+
+        NetworkState childState = new NetworkState(state);
+        state.getNodes().add(childState);
+        Map<String, Integer> newState = t.execute(state.getStates());
+        childState.getStates().putAll(newState);
+        childState.setExecutedTransitionName(t.getName());
+        childState.getExecutedTransitions().add(t.getName());   // FIXME new
+        String newStatesString = childState.getState();
+        allStates.add(childState);
+        if (states.contains(newStatesString)) {
+            childState.setDuplicate(true);
+            childState.getPath().add(newStatesString);
+        } else {
+
+            String coverState = getCoverState(childState.getStatesValues(), childState.getPath());
+            if (coverState == null) {
+                childState.getPath().add(newStatesString);
+                states.add(newStatesString);
+            } else {
+
+                childState.getPath().add(coverState);
+                updateMapValues(coverState, childState.getStates());
+                states.add(coverState);
+            }
+
+            if (state.getPath().size() < petriesNetwork.getMaxDepth()) {
+                operationQueue.add(childState);
+            }
+        }
     }
 
     private void updateMapValues(String coverString, Map<String, Integer> actualStates) {

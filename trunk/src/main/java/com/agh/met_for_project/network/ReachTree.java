@@ -60,24 +60,17 @@ public class ReachTree {
             boolean noActiveTransitions = true;
 
             List<Transition> executableTransitions = petriesNetwork.possibleTransitions(state.getStates());
-            for (Transition t : executableTransitions) {
+            if (!executableTransitions.isEmpty()) {
 
                 noActiveTransitions = false;
-                NetworkState childState = new NetworkState(state);
-                Map<String, Integer> newState = t.execute(state.getStates());
-                childState.getStates().putAll(newState);
-                childState.setExecutedTransitionName(t.getName());
-                state.getNodes().add(childState);
-                String newStateString = childState.getState();
-                allStates.add(childState);
-                childState.getPath().add(newStateString);
-                if (states.contains(newStateString)) {
-                    childState.setDuplicate(true);
+                if (petriesNetwork.isPrioritySimulation()) {
+
+                    Transition rand = executableTransitions.get(new Random().nextInt(executableTransitions.size()));
+                    executeTransition(state, rand);
                 } else {
 
-                    states.add(newStateString);
-                    if (state.getPath().size() < petriesNetwork.getMaxDepth()) {
-                        operationQueue.add(childState);
+                    for (Transition t : executableTransitions) {
+                        executeTransition(state, t);
                     }
                 }
             }
@@ -88,6 +81,27 @@ public class ReachTree {
         }
 
         petriesNetwork.getStatus().setReachTreeStatus(Status.TreeStatus.ACTUAL);
+    }
+
+    public void executeTransition(NetworkState state, Transition t) {
+
+        NetworkState childState = new NetworkState(state);
+        Map<String, Integer> newState = t.execute(state.getStates());
+        childState.getStates().putAll(newState);
+        childState.setExecutedTransitionName(t.getName());
+        state.getNodes().add(childState);
+        String newStateString = childState.getState();
+        allStates.add(childState);
+        childState.getPath().add(newStateString);
+        if (states.contains(newStateString)) {
+            childState.setDuplicate(true);
+        } else {
+
+            states.add(newStateString);
+            if (state.getPath().size() < petriesNetwork.getMaxDepth()) {
+                operationQueue.add(childState);
+            }
+        }
     }
 
     public List<NetworkState> getStates() {

@@ -121,4 +121,13 @@ public class AnalyzerController {
         return response;
     }
 
+    @RequestMapping(value = "/networklivness")
+    public ResponseObject networkLivness() {
+
+        ResponseObject response = new ResponseObject();
+        response.setPayload(analyzer.checkNetworkLivness());
+
+        return response;
+    }
+
 }

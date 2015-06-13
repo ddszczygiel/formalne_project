@@ -2,21 +2,20 @@ package com.agh.met_for_project.app;
 
 
 import com.agh.met_for_project.error.InvalidOperationException;
-import com.agh.met_for_project.model.service.ModifyArcWrapper;
+import com.agh.met_for_project.model.NetworkState;
 import com.agh.met_for_project.network.CoverTree;
 import com.agh.met_for_project.network.NetworkAnalyzer;
 import com.agh.met_for_project.network.PetriesNetwork;
 import com.agh.met_for_project.network.ReachTree;
 import com.agh.met_for_project.util.NetworkLoader;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.embedded.MultipartConfigFactory;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
 import javax.servlet.MultipartConfigElement;
-import java.util.Arrays;
 
 @SpringBootApplication
 @ComponentScan("com.agh.met_for_project")
@@ -43,23 +42,17 @@ public class App {
             PetriesNetwork network = (PetriesNetwork) applicationContext.getBean("petriesNetwork");
             ReachTree reachTree = (ReachTree) applicationContext.getBean("reachTree");
             networkLoader.loadNetwork(null);
-            System.out.println(networkAnalyzer.isBoundedness(Arrays.asList("2", "1")));
-            System.out.println(networkAnalyzer.isBoundedness(2));
-            System.out.println(networkAnalyzer.isReversible());
-            System.out.println(networkAnalyzer.isZachowawczaXD());
-            reachTree.displayTree();
-            System.out.println("############### AFTER MODIFY");
-            ModifyArcWrapper wrapper = new ModifyArcWrapper();
-            wrapper.setPlaceName("P2");
-            wrapper.setTransitionName("T1");
-            wrapper.setType("IN");
-            wrapper.setNewValue(3);
-            network.modifyArcParams(wrapper);
-            reachTree.buildReachTree();
-            reachTree.displayTree();
 //            network.setPrioritySimulation(true);
-//            coverTree.buildCoverTree();
-//            coverTree.displayTree();
+            coverTree.buildCoverTree();
+//            for (NetworkState state : coverTree.getStates()) {
+//                System.out.println(state.getState());
+//                System.out.println(state.getExecutedTransitions());
+//                System.out.println(state.getPath());
+//                System.out.println();
+//            }
+            System.out.println(networkAnalyzer.checkNetworkLivness());
+            System.out.println(networkAnalyzer.isReversible());
+            coverTree.displayTree();
 //            reachTree.buildReachTree();
 //            reachTree.displayTree();
 //            NetworkAnalyzer analyzer = (NetworkAnalyzer) applicationContext.getBean("networkAnalyzer");

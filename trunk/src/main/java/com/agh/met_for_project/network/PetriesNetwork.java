@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Component
@@ -26,7 +23,7 @@ public class PetriesNetwork {
     private Status status;
 
     private boolean prioritySimulation;
-    private int maxDepth = 20;
+    private int maxDepth = 30;
 
     private List<Place> places;
     private List<Transition> transitions;
@@ -312,9 +309,11 @@ public class PetriesNetwork {
 
         if (isPrioritySimulation()) {
 
-            Transition maxPriorityTransition = getMaxPriorityTransition(possibleTransitions);
-            if (maxPriorityTransition != null) {
-                transitionWrapperList.add(new PossibleTransitionWrapper(maxPriorityTransition.getName(), maxPriorityTransition.getPriority()));
+            List<Transition> allMaxPriorityTransition = getMaxPriorityTransition(possibleTransitions);
+            if (allMaxPriorityTransition != null) {
+                for (Transition t : allMaxPriorityTransition) {
+                    transitionWrapperList.add(new PossibleTransitionWrapper(t.getName(), t.getPriority()));
+                }
             }
         } else {
 
@@ -326,7 +325,7 @@ public class PetriesNetwork {
         return transitionWrapperList;
     }
 
-    private Transition getMaxPriorityTransition(List<Transition> transitions) {
+    private List<Transition> getMaxPriorityTransition(List<Transition> transitions) {
 
         int maxPriority = Integer.MIN_VALUE;
         Transition maxPriorityTransition = null;
@@ -338,8 +337,18 @@ public class PetriesNetwork {
             }
         }
 
-        // if null is returned, there are no executable transitions !
-        return maxPriorityTransition;
+        if (maxPriorityTransition == null) {
+            return null;
+        }
+
+        List<Transition> allMaxPriorityTransitions = new ArrayList<>();
+        for (Transition t : transitions) {
+            if (t.getPriority() == maxPriority) {
+                allMaxPriorityTransitions.add(t);
+            }
+        }
+
+        return allMaxPriorityTransitions;
     }
 
     // this is method for reach and cover tree
@@ -356,9 +365,9 @@ public class PetriesNetwork {
 
         if (isPrioritySimulation()) {
 
-            Transition maxPriorityTransition = getMaxPriorityTransition(possibleTransitions);
-            if (maxPriorityTransition != null) {
-                returnList.add(maxPriorityTransition);
+            List<Transition> allMaxPriorityTransition = getMaxPriorityTransition(possibleTransitions);
+            if (allMaxPriorityTransition != null) {
+                returnList.addAll(allMaxPriorityTransition);
             }
             return returnList;
         }
