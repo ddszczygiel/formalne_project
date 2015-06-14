@@ -22,7 +22,7 @@ public class PetriesNetwork {
     @Autowired
     private Status status;
 
-    private boolean prioritySimulation;
+    private boolean prioritySimulation = true;
     private int maxDepth = 30;
 
     private List<Place> places;

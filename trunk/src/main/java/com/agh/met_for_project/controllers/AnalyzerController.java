@@ -13,7 +13,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping(value="/api")
+@RequestMapping(value = "/api")
 public class AnalyzerController {
 
     @Autowired
@@ -47,7 +47,7 @@ public class AnalyzerController {
     }
 
     @RequestMapping(value = "/bounededness")
-    public ResponseObject isBounededness(@RequestBody int k){
+    public ResponseObject isBounededness(@RequestBody int k) {
 
         ResponseObject response = new ResponseObject();
         try {
@@ -60,7 +60,7 @@ public class AnalyzerController {
     }
 
     @RequestMapping(value = "/vectorbounededness")
-    public ResponseObject isBounededness(@RequestBody List<String> valuesVector){
+    public ResponseObject isBounededness(@RequestBody List<String> valuesVector) {
 
         ResponseObject response = new ResponseObject();
         try {
@@ -73,7 +73,7 @@ public class AnalyzerController {
     }
 
     @RequestMapping(value = "/safe")
-    public ResponseObject isSafe(){
+    public ResponseObject isSafe() {
 
         ResponseObject response = new ResponseObject();
         try {
@@ -126,6 +126,15 @@ public class AnalyzerController {
 
         ResponseObject response = new ResponseObject();
         response.setPayload(analyzer.checkNetworkLivness());
+
+        return response;
+    }
+
+    @RequestMapping(value = "/activeplaces")
+    public ResponseObject getActivePlaces() {
+
+        ResponseObject response = new ResponseObject();
+        response.setPayload(analyzer.placesActivity());
 
         return response;
     }

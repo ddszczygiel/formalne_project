@@ -5,6 +5,7 @@ import com.agh.met_for_project.error.InvalidOperationException;
 import com.agh.met_for_project.model.*;
 import com.agh.met_for_project.model.service.MatrixRepresentationWrapper;
 import com.agh.met_for_project.model.service.NetworkStateWrapper;
+import com.agh.met_for_project.model.service.PlaceActivityWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -95,7 +96,7 @@ public class NetworkAnalyzer {
 
         int[] vector = new int[vectorValues.size()];
         try {
-            for (int i=0; i<vector.length; i++) {
+            for (int i = 0; i < vector.length; i++) {
                 vector[i] = Integer.parseInt(vectorValues.get(i));
             }
         } catch (NumberFormatException e) {
@@ -116,14 +117,14 @@ public class NetworkAnalyzer {
             if (!state.isDuplicate()) {
 
                 int[] actual = state.getStatesValues();
-                for (int i=0; i<size; i++) {
-                    sumVector[i] = sumVector[i] + actual[i]*vector[i];
+                for (int i = 0; i < size; i++) {
+                    sumVector[i] = sumVector[i] + actual[i] * vector[i];
                 }
             }
         }
 
         int firstSum = sumVector[0];
-        for (int i=1; i<size; i++) {
+        for (int i = 1; i < size; i++) {
             if (firstSum != sumVector[i]) {
                 return Boolean.FALSE;
             }
@@ -141,7 +142,7 @@ public class NetworkAnalyzer {
         for (NetworkState state : reachTree.getStates()) {
 
             int[] actual = state.getStatesValues();
-            for (int i=0; i<actual.length; i++) {
+            for (int i = 0; i < actual.length; i++) {
                 if (actual[i] > k) {
                     return Boolean.FALSE;
                 }
@@ -326,6 +327,29 @@ public class NetworkAnalyzer {
         }
 
         return Boolean.TRUE;
+    }
+
+    public List<PlaceActivityWrapper> placesActivity() {
+
+        if (network.getStatus().getReachTreeStatus() == Status.TreeStatus.NEED_UPDATE) {
+            reachTree.buildReachTree();
+        }
+
+        List<NetworkState> states = reachTree.getStates();
+        Map<String, PlaceActivityWrapper> placeActivity = new HashMap<>();
+        for (Place p : network.getPlaces()) {
+            placeActivity.put(p.getName(), new PlaceActivityWrapper(p.getName(), PlaceActivity.DEAD));
+        }
+
+        for (NetworkState state : states) {
+            for (Map.Entry<String, Integer> entry : state.getStates().entrySet()) {
+                if (entry.getValue() > 0) {
+                    placeActivity.get(entry.getKey()).setPlaceActivity(PlaceActivity.ALIVE);
+                }
+            }
+        }
+
+        return new ArrayList<>(placeActivity.values());
     }
 
     private int sumElements(int[] array) {
